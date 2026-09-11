@@ -1,5 +1,5 @@
 import type { ActiveOverlay } from '../types/village';
-import { Castle, Users, Crosshair, Share2, Bot, Sparkles } from 'lucide-react';
+import { Castle, Users, Crosshair, Bot, Sparkles, Scroll } from 'lucide-react';
 
 interface HeaderNavProps {
   activeOverlay: ActiveOverlay;
@@ -29,15 +29,19 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
 
       {/* Center Circle Overlay Triggers: Villon Media & Villon AI */}
       <div className="header-circle-triggers">
-        {/* Villon Media Circle Trigger */}
+        {/* Villon Media Scroll Trigger */}
         <button 
-          className={`circle-trigger-btn ${activeOverlay === 'media' ? 'active' : ''}`}
+          className={`circle-trigger-btn scroll-trigger-btn ${activeOverlay === 'media' ? 'active' : ''}`}
           onClick={() => onOpenOverlay('media')}
-          title="Ouvrir le journal social de Villon"
+          title="Dérouler le parchemin de Villon (Villon Media)"
         >
-          <div className="circle-inner media-circle">
-            <Share2 size={24} />
-            <span className="live-pulse-dot" />
+          <div className="circle-inner scroll-nav-pill">
+            <div className="mini-dowel-cap cap-left" />
+            <div className="mini-scroll-body">
+              <Scroll size={20} className="scroll-svg-icon" />
+              <span className="mini-wax-seal">⚜</span>
+            </div>
+            <div className="mini-dowel-cap cap-right" />
           </div>
           <span className="circle-name">Villon Media</span>
         </button>

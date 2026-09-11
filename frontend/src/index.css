@@ -164,6 +164,79 @@ body, html {
   color: #fff;
 }
 
+/* Medieval Rolled Scroll Trigger in Navigation */
+.scroll-nav-pill {
+  width: 54px;
+  height: 44px;
+  border-radius: 8px;
+  background: 
+    radial-gradient(ellipse at 50% 30%, rgba(255, 248, 220, 0.4) 0%, rgba(185, 140, 65, 0.4) 80%),
+    url('/parchment-bg.jpg');
+  background-size: cover;
+  border: 1.5px solid #b8860b !important;
+  box-shadow: 0 4px 12px rgba(80, 45, 15, 0.25), inset 0 2px 3px rgba(255, 235, 180, 0.4);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.circle-trigger-btn:hover .scroll-nav-pill {
+  transform: scale(1.1);
+  box-shadow: 0 0 16px rgba(212, 175, 55, 0.6), 0 4px 14px rgba(80, 45, 15, 0.35);
+  border-color: #ffd700 !important;
+}
+
+.mini-dowel-cap {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 6px;
+  background: linear-gradient(180deg, #ffd700 0%, #a6701b 45%, #421c08 100%);
+  border-radius: 3px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  z-index: 2;
+}
+
+.mini-dowel-cap.cap-left {
+  left: -4px;
+}
+
+.mini-dowel-cap.cap-right {
+  right: -4px;
+}
+
+.mini-scroll-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.scroll-svg-icon {
+  color: #3b200b;
+  filter: drop-shadow(0 1px 1px rgba(255, 245, 220, 0.8));
+}
+
+.mini-wax-seal {
+  position: absolute;
+  bottom: -5px;
+  right: -7px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #c42727, #660a0a);
+  color: #f7d488;
+  font-size: 8.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  border: 1px dashed #e89191;
+  font-weight: 700;
+}
+
 .ai-circle {
   background: linear-gradient(135deg, #734a32, #4a3324);
   color: #fff;
@@ -810,215 +883,577 @@ body, html {
   cursor: not-allowed;
 }
 
-/* Social Media Modal */
-.social-media-modal {
-  width: 680px;
-  max-width: 100%;
-  height: 680px;
-  max-height: 90vh;
-  background: var(--glass-card);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid var(--border-amber);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-frost);
+/* Antique Scroll Modal & Physical Unrolling Animation */
+.scroll-overlay-backdrop {
+  background: rgba(35, 20, 10, 0.72) !important;
+  backdrop-filter: blur(8px) saturate(1.15) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(1.15) !important;
+  transition: opacity 0.22s ease;
+}
+
+.scroll-overlay-backdrop.fade-out {
+  opacity: 0;
+}
+
+.villon-scroll-wrapper {
+  width: 720px;
+  max-width: 96vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  filter: drop-shadow(0 25px 35px rgba(25, 12, 4, 0.75)) drop-shadow(0 8px 16px rgba(0, 0, 0, 0.5));
+  user-select: text;
+  z-index: 210;
+}
+
+/* Physical Unrolling Paper Container */
+.scroll-unfurl-container {
+  width: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  position: relative;
+  transition: height 0.5s cubic-bezier(0.14, 0.96, 0.28, 1.05), opacity 0.25s ease;
 }
 
-.social-header {
-  padding: 16px 22px;
-  background: rgba(245, 238, 228, 0.9);
-  border-bottom: 1px solid var(--border-beige);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+/* Phase 1: Closed State (Bondho) - Completely rolled up cylinder */
+.phase-closed .scroll-unfurl-container {
+  height: 0px !important;
+  max-height: 0px !important;
+  opacity: 0;
+  pointer-events: none;
 }
 
-.social-header-brand {
-  display: flex;
-  align-items: center;
-  gap: 14px;
+.phase-closed .scroll-roller-bottom {
+  transform: translateY(0);
 }
 
-.social-icon-badge {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--autumn-amber), var(--autumn-rust));
-  color: #fff;
+/* Phase 2: Unrolling State (Khulche) - Expanding downwards to full length */
+.phase-unrolling .scroll-unfurl-container {
+  height: 620px !important;
+  max-height: 75vh !important;
+  opacity: 1;
+}
+
+.phase-unrolling .scroll-roller-bottom .roller-bar {
+  animation: spinRollerUnroll 0.5s cubic-bezier(0.14, 0.96, 0.28, 1.05) forwards;
+}
+
+/* Phase 3: Fully Open (Khula) */
+.phase-open .scroll-unfurl-container {
+  height: 620px !important;
+  max-height: 75vh !important;
+  opacity: 1;
+}
+
+/* Phase 4: Closing State (Bondho hocche) - Rolls all the way back up */
+.phase-closing .scroll-unfurl-container {
+  height: 0px !important;
+  max-height: 0px !important;
+  opacity: 0.2;
+  transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+}
+
+.phase-closing .scroll-roller-bottom .roller-bar {
+  animation: spinRollerRollUp 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes spinRollerUnroll {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(720deg);
+  }
+}
+
+@keyframes spinRollerRollUp {
+  0% {
+    transform: rotate(720deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+/* Closed Scroll Ribbon Band & Wax Seal (Visible across the closed rollers) */
+.closed-scroll-band {
+  position: absolute;
+  top: 28px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 40;
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: none;
+  transition: transform 0.2s ease-out, opacity 0.2s ease-out;
 }
 
-.social-header h2 {
-  font-family: var(--font-heading);
-  font-size: 19px;
-  font-weight: 800;
-  color: var(--autumn-brown-dark);
-  margin: 0;
+.closed-band-ribbon {
+  position: absolute;
+  width: 28px;
+  height: 56px;
+  background: linear-gradient(90deg, #590909 0%, #9e1515 35%, #d12e2e 50%, #9e1515 65%, #590909 100%);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(255, 200, 200, 0.5);
+  border-radius: 3px;
+  border-left: 1px solid #d4af37;
+  border-right: 1px solid #d4af37;
 }
 
-.social-header p {
-  font-size: 12px;
-  color: var(--autumn-chestnut);
-}
-
-.create-post-card {
-  padding: 16px 22px;
-  border-bottom: 1px solid var(--border-beige);
-  background: rgba(255, 255, 255, 0.3);
-}
-
-.create-post-top {
-  display: flex;
-  gap: 12px;
-}
-
-.create-post-avatar {
-  width: 38px;
-  height: 38px;
+.closed-band-seal {
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #d92b2b 0%, #9e1515 55%, #540808 100%);
+  border: 2px dashed #f0a3a3;
+  box-shadow: 0 5px 15px rgba(60, 6, 6, 0.8), inset 0 2px 4px rgba(255, 200, 200, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
 }
 
-.create-post-input {
-  flex: 1;
-  background: #fff;
-  border: 1px solid var(--border-beige);
-  border-radius: var(--radius-md);
-  padding: 10px;
-  color: var(--autumn-brown-dark);
-  font-family: var(--font-body);
-  font-size: 13px;
-  resize: none;
-  outline: none;
+.closed-band-seal .wax-monogram {
+  font-size: 24px;
+  color: #fce19a;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
 }
 
-.create-post-bottom {
+.band-snapping {
+  transform: translate(-50%, -50%) scale(1.4) !important;
+  opacity: 0 !important;
+}
+
+/* Scroll Rollers (Top & Bottom Carved Wooden Spindles) */
+.scroll-roller {
+  width: calc(100% + 56px);
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 10px;
+  z-index: 25;
+  position: relative;
+  flex-shrink: 0;
 }
 
-.create-post-tag {
-  font-size: 12px;
-  color: var(--autumn-rust);
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 4px;
+.scroll-roller-top {
+  margin-bottom: -5px;
 }
 
-.post-submit-btn {
-  background: linear-gradient(135deg, var(--autumn-amber), var(--autumn-rust));
-  color: #fff;
-  border: none;
-  padding: 6px 18px;
-  border-radius: var(--radius-full);
-  font-size: 12px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(217, 119, 54, 0.25);
+.scroll-roller-bottom {
+  margin-top: -5px;
 }
 
-.social-feed-list {
+.roller-bar {
   flex: 1;
-  overflow-y: auto;
-  padding: 18px 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.55), inset 0 2px 4px rgba(255, 235, 190, 0.4), inset 0 -3px 5px rgba(0, 0, 0, 0.8);
+  border-radius: 4px;
+}
+
+.roller-wood-core {
+  flex: 1;
+  height: 100%;
+  background: linear-gradient(180deg, #421e06 0%, #693412 18%, #9e5a25 42%, #ce8c47 50%, #8c4b1d 75%, #331503 100%);
+  position: relative;
+}
+
+.roller-brass-ring {
+  width: 12px;
+  height: 24px;
+  background: linear-gradient(180deg, #ffd700 0%, #fff2a3 30%, #b8860b 70%, #594002 100%);
+  border-radius: 2px;
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.7);
+  flex-shrink: 0;
+  z-index: 2;
+}
+
+.roller-finial {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.finial-ball {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #e29f5b 0%, #9e5522 45%, #3d1b05 100%);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.55), inset 0 1px 3px rgba(255, 235, 200, 0.5);
+  border: 1px solid #291002;
+}
+
+.finial-tip {
+  width: 15px;
+  height: 15px;
+  background: radial-gradient(circle at 40% 40%, #ffd700 0%, #b8860b 60%, #4a3402 100%);
+  clip-path: polygon(100% 50%, 0% 0%, 0% 100%);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
+}
+
+.finial-left .finial-tip {
+  transform: rotate(180deg);
+}
+
+/* Curled Paper Edges around Spindles */
+.scroll-paper-curl-top {
+  width: 100%;
+  height: 12px;
+  background: linear-gradient(180deg, rgba(50, 25, 8, 0.85) 0%, rgba(170, 130, 80, 0.6) 45%, rgba(223, 194, 133, 1) 100%);
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.scroll-paper-curl-bottom {
+  width: 100%;
+  height: 12px;
+  background: linear-gradient(0deg, rgba(50, 25, 8, 0.85) 0%, rgba(170, 130, 80, 0.6) 45%, rgba(223, 194, 133, 1) 100%);
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+/* Parchment Paper Body - Antique Yellowish-Beige Old Paper Texture */
+.scroll-parchment-body {
+  width: 100%;
+  height: 620px;
+  max-height: 75vh;
+  background-color: #dfc284;
+  background-image: 
+    radial-gradient(ellipse at 50% 25%, rgba(255, 248, 220, 0.22) 0%, rgba(185, 135, 55, 0.32) 70%, rgba(95, 50, 15, 0.75) 100%),
+    url('/parchment-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-left: 5px solid #a4763c;
+  border-right: 5px solid #a4763c;
+  box-shadow: 
+    inset 0 25px 30px -10px rgba(65, 35, 10, 0.6),
+    inset 0 -25px 30px -10px rgba(65, 35, 10, 0.6),
+    inset 28px 0 30px -12px rgba(65, 35, 10, 0.45),
+    inset -28px 0 30px -12px rgba(65, 35, 10, 0.45);
   display: flex;
   flex-direction: column;
-  gap: 16px;
-}
-
-.feed-post-card {
-  background: #fff;
-  border: 1px solid var(--border-beige);
-  border-radius: var(--radius-md);
-  padding: 16px;
-  box-shadow: 0 2px 10px rgba(74, 51, 36, 0.05);
-}
-
-.post-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.post-author-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-}
-
-.post-author-name {
-  font-weight: 700;
-  font-size: 14px;
-  color: var(--autumn-brown-dark);
-}
-
-.post-meta {
-  font-size: 11px;
-  color: var(--autumn-chestnut);
-}
-
-.post-badge-tag {
-  margin-left: auto;
-  font-size: 11px;
-  color: var(--autumn-amber);
-  background: rgba(217, 119, 54, 0.1);
-  padding: 2px 9px;
-  border-radius: var(--radius-full);
-  font-weight: 700;
-}
-
-.post-content {
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--autumn-brown);
-  margin-bottom: 12px;
-}
-
-.post-image-wrapper {
-  border-radius: var(--radius-md);
   overflow: hidden;
-  margin-bottom: 12px;
-  max-height: 240px;
+  position: relative;
+  color: #2b1708;
 }
 
-.post-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.scroll-unroll-fast .scroll-parchment-body > * {
+  animation: paperContentFadeIn 0.25s 0.1s ease-out backwards;
 }
 
-.post-actions-bar {
+@keyframes paperContentFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Wax Seal & Ribbon */
+.scroll-wax-seal-ribbon {
+  position: absolute;
+  top: 6px;
+  right: 68px;
+  z-index: 15;
   display: flex;
-  gap: 16px;
-  border-top: 1px solid var(--border-beige);
-  padding-top: 10px;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
 }
 
-.action-btn {
-  background: transparent;
-  border: none;
-  color: var(--autumn-chestnut);
-  font-size: 12px;
-  font-weight: 600;
+.wax-seal-disc {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #c42727 0%, #941717 55%, #570a0a 100%);
+  border: 2px dashed #e89191;
+  box-shadow: 0 4px 12px rgba(65, 8, 8, 0.6), inset 0 2px 4px rgba(255, 200, 200, 0.4);
   display: flex;
   align-items: center;
-  gap: 6px;
-  cursor: pointer;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
 }
 
-.action-btn.liked {
-  color: var(--autumn-rust);
+.wax-monogram {
+  font-size: 22px;
+  color: #f7d488;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.4));
+}
+
+.wax-ribbon {
+  position: absolute;
+  top: 26px;
+  width: 15px;
+  height: 40px;
+  background: linear-gradient(180deg, #941717 0%, #680d0d 100%);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%);
+  z-index: 1;
+}
+
+.ribbon-left {
+  left: 3px;
+  transform: rotate(8deg);
+}
+
+.ribbon-right {
+  right: 3px;
+  transform: rotate(-10deg);
+}
+
+/* Header & Typography */
+.scroll-header {
+  padding: 16px 26px 10px;
+  background: transparent;
+  border-bottom: 1.5px solid rgba(150, 105, 55, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.scroll-icon-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8a481c, #59290b);
+  color: #faeed4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 8px rgba(70, 35, 12, 0.35);
+  border: 1.5px solid #d4a76a;
+}
+
+.scroll-pretitle {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.8px;
+  font-weight: 700;
+  color: #804818;
+  margin-bottom: 2px;
+}
+
+.scroll-title {
+  font-family: var(--font-heading);
+  font-size: 23px;
+  font-weight: 800;
+  color: #241103;
+  margin: 0;
+  text-shadow: 0 1px 1px rgba(255, 240, 205, 0.6);
+}
+
+.scroll-subtitle {
+  font-size: 12px;
+  color: #5c3414;
+  font-style: italic;
+}
+
+.scroll-close-btn {
+  background: rgba(100, 60, 25, 0.15);
+  border: 1.5px solid #a67c45;
+  color: #4a240a;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(60, 30, 10, 0.2);
+}
+
+.scroll-close-btn:hover {
+  background: #941717;
+  border-color: #680d0d;
+  color: #fff;
+  transform: rotate(90deg);
+}
+
+/* Flourish Ornament Divider */
+.parchment-flourish-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 8px 24px 4px;
+  color: #7d481a;
+  font-size: 14px;
+}
+
+.flourish-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(140, 95, 45, 0.6), transparent);
+}
+
+.flourish-crest {
+  font-family: var(--font-heading);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #693610;
+}
+
+/* Scribe Announcement Form */
+.parchment-post-card {
+  padding: 12px 24px;
+  background: rgba(230, 204, 155, 0.65);
+  border-bottom: 2px dashed rgba(145, 100, 50, 0.45);
+  box-shadow: inset 0 2px 6px rgba(80, 45, 15, 0.08);
+}
+
+.parchment-avatar {
+  border: 2px solid #a67c45;
+  box-shadow: 0 2px 6px rgba(60, 30, 10, 0.2);
+}
+
+.parchment-input-wrapper {
+  flex: 1;
+}
+
+.parchment-input {
+  background: rgba(248, 232, 198, 0.9);
+  border: 1.5px solid #b88d55;
+  color: #261204;
+  font-style: italic;
+  box-shadow: inset 0 2px 5px rgba(70, 40, 15, 0.1);
+}
+
+.parchment-input:focus {
+  border-color: #8c4c1a;
+  box-shadow: 0 0 0 2px rgba(160, 95, 40, 0.25);
+  outline: none;
+}
+
+.parchment-post-bottom {
+  margin-top: 8px;
+}
+
+.parchment-tag {
+  color: #7d3f14;
+  font-weight: 700;
+  background: rgba(160, 100, 45, 0.18);
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(160, 100, 45, 0.3);
+}
+
+.parchment-submit-btn {
+  background: linear-gradient(135deg, #783812, #461c04);
+  border: 1.5px solid #d4a76a;
+  color: #faeed4;
+  box-shadow: 0 3px 8px rgba(50, 22, 6, 0.4);
+  transition: all 0.2s ease;
+}
+
+.parchment-submit-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #944617, #572406);
+  transform: translateY(-1px);
+  box-shadow: 0 5px 12px rgba(50, 22, 6, 0.5);
+}
+
+/* Feed Posts in Parchment Style */
+.parchment-feed-list {
+  padding: 16px 26px 22px;
+  scrollbar-width: thin;
+  scrollbar-color: #a4763c transparent;
+}
+
+.parchment-feed-list::-webkit-scrollbar {
+  width: 7px;
+}
+
+.parchment-feed-list::-webkit-scrollbar-thumb {
+  background-color: #a4763c;
+  border-radius: 4px;
+}
+
+.parchment-feed-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.parchment-notice-card {
+  background: rgba(228, 203, 150, 0.58);
+  backdrop-filter: blur(2px);
+  border: 1.5px solid rgba(145, 100, 48, 0.48);
+  border-radius: 8px;
+  box-shadow: 0 3px 10px rgba(60, 35, 12, 0.14), inset 0 0 16px rgba(160, 115, 60, 0.18);
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.parchment-notice-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 16px rgba(60, 35, 12, 0.2), inset 0 0 16px rgba(160, 115, 60, 0.22);
+}
+
+.parchment-card-header {
+  border-bottom: 1px solid rgba(165, 120, 70, 0.35);
+  padding-bottom: 8px;
+}
+
+.parchment-author-avatar {
+  border: 2px solid #b88d55;
+}
+
+.parchment-author-name {
+  font-family: var(--font-heading);
+  color: #241103;
+  font-weight: 700;
+}
+
+.parchment-meta {
+  color: #6e3f1a;
+  font-size: 11px;
+}
+
+.parchment-badge-tag {
+  background: rgba(160, 100, 45, 0.18);
+  color: #7d3f14;
+  border: 1px solid rgba(160, 100, 45, 0.28);
+}
+
+.parchment-content {
+  color: #2c1606;
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+.parchment-image-frame {
+  border: 2px solid #b88d55;
+  box-shadow: 0 3px 8px rgba(50, 25, 8, 0.2);
+}
+
+.parchment-actions-bar {
+  border-top: 1px solid rgba(165, 120, 70, 0.35);
+}
+
+.parchment-action-btn {
+  color: #5c3414;
+  transition: all 0.2s ease;
+}
+
+.parchment-action-btn:hover {
+  color: #941717;
+}
+
+.parchment-action-btn.liked {
+  color: #a81c1c;
 }
 
 /* Villon AI Chatbot Modal */
@@ -1243,4 +1678,25 @@ body, html {
   justify-content: center;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(217, 119, 54, 0.25);
+}
+
+.scroll-unfurl-container {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+.scroll-parchment-body {
+  height: auto !important;
+  min-height: max-content !important;
+  overflow: visible !important;
+}
+
+.parchment-feed-list {
+  height: auto !important;
+  overflow: visible !important;
 }
