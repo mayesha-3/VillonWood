@@ -14,7 +14,15 @@ export interface VillagerProfession {
   frenchTitle: string;
   characterName: string;
   structureName: string;
-  category: 'Food & Farming' | 'Crafts & Building' | 'Trades & Artisans' | 'Hospitality & Nature';
+  category: 
+    | 'Food & Farming' 
+    | 'Crafts & Building' 
+    | 'Trades & Artisans' 
+    | 'Hospitality & Nature'
+    | 'Alimentation et agriculture'
+    | 'Artisanat et construction'
+    | 'Métiers et artisanat'
+    | 'Accueil et nature';
   x: number; // relative percentage (0 - 100)
   y: number; // relative percentage (0 - 100)
   description: string;

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import HeaderNav from './components/HeaderNav';
+import GameHUDTopLeft from './components/GameHUDTopLeft';
+import FrostedFooter from './components/FrostedFooter';
 import MapViewer from './components/MapViewer';
 import SocialMedia from './socialMedia';
 import Chatbot from './chatbot';
@@ -10,7 +11,6 @@ import type { VillagerProfession, ActiveOverlay } from './types/village';
 export const App: React.FC = () => {
   const [activeOverlay, setActiveOverlay] = useState<ActiveOverlay>(null);
   const [selectedLocation, setSelectedLocation] = useState<VillagerProfession | null>(null);
-  const [inspectorMode, setInspectorMode] = useState<boolean>(false);
 
   const handleSelectLocation = (location: VillagerProfession) => {
     setSelectedLocation(location);
@@ -25,23 +25,22 @@ export const App: React.FC = () => {
 
   return (
     <div className="villon-app-layout">
-      {/* Header Navigation with Villon Media & Villon AI Circular Triggers */}
-      <HeaderNav
-        activeOverlay={activeOverlay}
-        onOpenOverlay={(overlay) => setActiveOverlay(overlay)}
-        inspectorMode={inspectorMode}
-        onToggleInspectorMode={() => setInspectorMode((prev) => !prev)}
-      />
+      {/* Top-Left Tactical Videogame HUD (Free Fire Style): Logo & Active Villagers */}
+      <GameHUDTopLeft totalVillagers={VILLAGERS_DATA.length} />
 
-      {/* Main Interactive Map Viewport (Draggable & Zoomable) */}
+      {/* Main Interactive Map Viewport (Draggable & Zoomable - Full Viewport) */}
       <main className="main-content-viewport">
         <MapViewer
           villagers={VILLAGERS_DATA}
           onSelectLocation={handleSelectLocation}
-          inspectorMode={inspectorMode}
-          onToggleInspectorMode={() => setInspectorMode((prev) => !prev)}
         />
       </main>
+
+      {/* Frosted Glass Bottom Footer: Villon AI (Left) & Villon Media (Right) */}
+      <FrostedFooter
+        activeOverlay={activeOverlay}
+        onOpenOverlay={(overlay) => setActiveOverlay(overlay)}
+      />
 
       {/* Villon Media Overlay */}
       {activeOverlay === 'media' && (

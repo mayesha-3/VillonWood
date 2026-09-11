@@ -2,20 +2,18 @@ import React, { useState, useRef } from 'react';
 import type { VillagerProfession } from '../types/village';
 import mapImage from '../assets/map.png';
 import { 
-  Crosshair, Users, MessageSquare, MapPin, Anchor, Flame, Cake, 
+  Users, MessageSquare, MapPin, Anchor, Flame, Cake, 
   Wheat, Wine, Cloud, Shield, Wind, Hammer, Disc, Beer, Scissors, 
-  Footprints, Wrench, Box, Circle, Archive, Feather, Utensils
+  Footprints, Wrench, Box, Circle, Archive, Feather, Utensils, Check
 } from 'lucide-react';
 
 interface MapViewerProps {
   villagers: VillagerProfession[];
   onSelectLocation: (villager: VillagerProfession) => void;
-  inspectorMode: boolean;
-  onToggleInspectorMode: () => void;
 }
 
 // Icon helper function for professions
-const renderProfessionIcon = (iconName: string, size = 18) => {
+const renderProfessionIcon = (iconName: string, size = 16) => {
   switch (iconName) {
     case 'Wheat': return <Wheat size={size} />;
     case 'Wine': return <Wine size={size} />;
@@ -42,17 +40,13 @@ const renderProfessionIcon = (iconName: string, size = 18) => {
 
 export const MapViewer: React.FC<MapViewerProps> = ({
   villagers,
-  onSelectLocation,
-  inspectorMode,
-  onToggleInspectorMode
+  onSelectLocation
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapImageRef = useRef<HTMLImageElement>(null);
 
-  // Locked at 200% scale (2.0) as requested
-  const FIXED_SCALE = 2;
-
-  // Drag position state
+  // Full-map viewport: starts at 1.0 scale (entire map visible, uncropped)
+  const [scale, setScale] = useState<number>(1);
   const [position, setPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [dragStart, setDragStart] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -60,17 +54,28 @@ export const MapViewer: React.FC<MapViewerProps> = ({
   // Hover state for tooltip pin preview
   const [hoveredVillager, setHoveredVillager] = useState<VillagerProfession | null>(null);
 
-  // Inspector coordinate toast state
-  const [lastClickedCoords, setLastClickedCoords] = useState<{ x: number; y: number } | null>(null);
+  // Live Debug Cursor Coordinates (0-100%)
+  const [cursorCoords, setCursorCoords] = useState<{ x: number; y: number } | null>(null);
+  const [copiedCoords, setCopiedCoords] = useState<{ x: number; y: number } | null>(null);
 
-  // Mouse Drag handlers
+  // Mouse Drag & Cursor Coordinate tracking
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (e.button !== 0) return; // Only primary click
+    if (e.button !== 0) return; // Primary click only
     setIsDragging(true);
     setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
+    // Update live cursor percentage coordinates
+    if (mapImageRef.current) {
+      const rect = mapImageRef.current.getBoundingClientRect();
+      const rawX = ((e.clientX - rect.left) / rect.width) * 100;
+      const rawY = ((e.clientY - rect.top) / rect.height) * 100;
+      const clampedX = Math.round(Math.max(0, Math.min(100, rawX)));
+      const clampedY = Math.round(Math.max(0, Math.min(100, rawY)));
+      setCursorCoords({ x: clampedX, y: clampedY });
+    }
+
     if (!isDragging) return;
     setPosition({
       x: e.clientX - dragStart.x,
@@ -82,74 +87,139 @@ export const MapViewer: React.FC<MapViewerProps> = ({
     setIsDragging(false);
   };
 
-  // Map Click handler for Inspector Mode (Coordinates Picker)
+  const handleMouseLeave = () => {
+    setIsDragging(false);
+    setCursorCoords(null);
+  };
+
+  // Optional Smooth Wheel Zoom
+  const handleWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+    const zoomFactor = e.deltaY < 0 ? 1.15 : 0.88;
+    setScale((prevScale) => {
+      const nextScale = Math.min(Math.max(prevScale * zoomFactor, 1), 3);
+      if (nextScale === 1) {
+        setPosition({ x: 0, y: 0 }); // reset center when fully zoomed out
+      }
+      return nextScale;
+    });
+  };
+
+  // Double click resets zoom to full-map overview
+  const handleDoubleClick = () => {
+    setScale(1);
+    setPosition({ x: 0, y: 0 });
+  };
+
+  // Map Click handler to easily copy coordinates for villagers.ts
   const handleMapClick = (e: React.MouseEvent) => {
-    if (!inspectorMode || !mapImageRef.current) return;
+    if (!mapImageRef.current) return;
     const rect = mapImageRef.current.getBoundingClientRect();
-    
-    // Calculate click position as percentage of map image width and height
     const clickX = e.clientX - rect.left;
     const clickY = e.clientY - rect.top;
-    
     const xPct = Math.round((clickX / rect.width) * 100);
     const yPct = Math.round((clickY / rect.height) * 100);
-
-    setLastClickedCoords({ x: xPct, y: yPct });
-
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(`x: ${xPct}, y: ${yPct}`);
+    if (xPct >= 0 && xPct <= 100 && yPct >= 0 && yPct <= 100) {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(`x: ${xPct}, y: ${yPct}`);
+      }
+      setCopiedCoords({ x: xPct, y: yPct });
+      setTimeout(() => setCopiedCoords(null), 2500);
     }
   };
 
+  // Grid steps for 0-100% overlay
+  const majorSteps = [10, 20, 30, 40, 50, 60, 70, 80, 90];
+  const minorSteps = [5, 15, 25, 35, 45, 55, 65, 75, 85, 95];
+
   return (
     <div className="map-viewer-container" ref={containerRef}>
-      {/* Floating Toolbar for Inspector */}
-      <div className="map-controls-toolbar">
-        <button 
-          className={`map-btn inspector-btn ${inspectorMode ? 'active' : ''}`}
-          onClick={onToggleInspectorMode}
-          title="Activer l’inspecteur pour obtenir les coordonnées x et y"
-        >
-          <Crosshair size={18} />
-          <span>{inspectorMode ? 'Inspecteur activé' : 'Inspecter les coordonnées'}</span>
-        </button>
-      </div>
-
-      {/* Coordinate Toast when Inspector Clicked */}
-      {inspectorMode && lastClickedCoords && (
-        <div className="inspector-coord-toast">
-          <Crosshair size={16} />
-          <span>Coordonnées : <strong>x : {lastClickedCoords.x} %, y : {lastClickedCoords.y} %</strong></span>
-          <small>(Copiées dans le presse-papiers)</small>
-        </div>
-      )}
-
-      {/* Interactive Draggable Viewport - Always 200% scale */}
+      {/* Interactive Viewport Canvas */}
       <div 
-        className={`map-viewport ${isDragging ? 'is-dragging' : ''} ${inspectorMode ? 'is-inspecting' : ''}`}
+        className={`map-viewport ${isDragging ? 'is-dragging' : ''}`}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
+        onMouseLeave={handleMouseLeave}
+        onWheel={handleWheel}
+        onDoubleClick={handleDoubleClick}
       >
+        {/* Responsive 16:9 Aspect Ratio Map Stage */}
         <div 
-          className="map-transform-wrapper"
+          className="map-stage-wrapper"
           style={{
-            transform: `translate(${position.x}px, ${position.y}px) scale(${FIXED_SCALE})`,
+            transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
             transformOrigin: 'center center'
           }}
+          onClick={handleMapClick}
         >
-          {/* Main Village Map Image */}
+          {/* Main Village Map Image (Full 16:9 view, uncropped) */}
           <img 
             ref={mapImageRef}
             src={mapImage} 
             alt="Carte du village français ancien de VillonWood"
             className="village-map-image"
-            onClick={handleMapClick}
             draggable={false}
           />
 
-          {/* Render 20 Interactive Villager Structure Pins */}
+          {/* Temporary Debug Coordinate Grid Overlay (0-100%) */}
+          <div className="debug-grid-container">
+            {/* SVG Grid Lines */}
+            <svg className="debug-grid-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+              {/* Minor Grid Lines (every 5%) */}
+              {minorSteps.map((s) => (
+                <React.Fragment key={`minor-${s}`}>
+                  <line x1={s} y1={0} x2={s} y2={100} stroke="rgba(255, 255, 255, 0.2)" strokeWidth="0.12" strokeDasharray="0.6 0.6" />
+                  <line x1={0} y1={s} x2={100} y2={s} stroke="rgba(255, 255, 255, 0.2)" strokeWidth="0.12" strokeDasharray="0.6 0.6" />
+                </React.Fragment>
+              ))}
+
+              {/* Major Grid Lines (every 10%) */}
+              {majorSteps.map((s) => (
+                <React.Fragment key={`major-${s}`}>
+                  <line x1={s} y1={0} x2={s} y2={100} stroke="rgba(255, 255, 255, 0.5)" strokeWidth="0.2" />
+                  <line x1={0} y1={s} x2={100} y2={s} stroke="rgba(255, 255, 255, 0.5)" strokeWidth="0.2" />
+                </React.Fragment>
+              ))}
+
+              {/* 50% Center Axis Lines */}
+              <line x1={50} y1={0} x2={50} y2={100} stroke="#f59e0b" strokeWidth="0.35" strokeDasharray="1 1" />
+              <line x1={0} y1={50} x2={100} y2={50} stroke="#f59e0b" strokeWidth="0.35" strokeDasharray="1 1" />
+            </svg>
+
+            {/* X-Axis Percentage Labels across Top */}
+            <div className="debug-axis-labels-x">
+              {majorSteps.map((s) => (
+                <div key={`lbl-x-${s}`} className="debug-grid-label x-label" style={{ left: `${s}%` }}>
+                  {s}%
+                </div>
+              ))}
+            </div>
+
+            {/* Y-Axis Percentage Labels along Left */}
+            <div className="debug-axis-labels-y">
+              {majorSteps.map((s) => (
+                <div key={`lbl-y-${s}`} className="debug-grid-label y-label" style={{ top: `${s}%` }}>
+                  {s}%
+                </div>
+              ))}
+            </div>
+
+            {/* Live Cursor Coordinate Chip */}
+            {cursorCoords && (
+              <div 
+                className="debug-cursor-chip"
+                style={{
+                  left: `${cursorCoords.x}%`,
+                  top: `${cursorCoords.y}%`
+                }}
+              >
+                x: {cursorCoords.x} | y: {cursorCoords.y}
+              </div>
+            )}
+          </div>
+
+          {/* Render 20 Interactive Villager Structure Pins with Debug x/y Values */}
           {villagers.map((v) => {
             const isBoat = v.id === 'fisherman';
             return (
@@ -167,6 +237,11 @@ export const MapViewer: React.FC<MapViewerProps> = ({
                   onSelectLocation(v);
                 }}
               >
+                {/* Debug Coordinate Badge Above Marker */}
+                <div className="pin-debug-coord-badge">
+                  x: {v.x} | y: {v.y}
+                </div>
+
                 <div className="pin-pulse-ring" />
                 <div className="pin-icon-badge">
                   {renderProfessionIcon(v.iconName, 14)}
@@ -184,6 +259,14 @@ export const MapViewer: React.FC<MapViewerProps> = ({
           })}
         </div>
       </div>
+
+      {/* Coordinate Copied Toast */}
+      {copiedCoords && (
+        <div className="debug-copied-toast">
+          <Check size={14} className="toast-icon" />
+          <span>Coordonnées copiées : <strong>x: {copiedCoords.x}, y: {copiedCoords.y}</strong></span>
+        </div>
+      )}
 
       {/* Hovered Location Quick Tooltip Card */}
       {hoveredVillager && (
