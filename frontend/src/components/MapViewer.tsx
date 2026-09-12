@@ -4,7 +4,7 @@ import mapImage from '../assets/map.png';
 import { 
   Users, MessageSquare, MapPin, Anchor, Flame, Cake, 
   Wheat, Wine, Cloud, Shield, Wind, Hammer, Disc, Beer, Scissors, 
-  Footprints, Wrench, Box, Circle, Archive, Feather, Utensils, Check
+  Footprints, Wrench, Box, Circle, Archive, Feather, Utensils
 } from 'lucide-react';
 
 interface MapViewerProps {
@@ -54,11 +54,7 @@ export const MapViewer: React.FC<MapViewerProps> = ({
   // Hover state for tooltip pin preview
   const [hoveredVillager, setHoveredVillager] = useState<VillagerProfession | null>(null);
 
-  // Live Debug Cursor Coordinates (0-100%)
-  const [cursorCoords, setCursorCoords] = useState<{ x: number; y: number } | null>(null);
-  const [copiedCoords, setCopiedCoords] = useState<{ x: number; y: number } | null>(null);
-
-  // Mouse Drag & Cursor Coordinate tracking
+  // Mouse Drag handlers (when scale > 1 or panning)
   const handleMouseDown = (e: React.MouseEvent) => {
     if (e.button !== 0) return; // Primary click only
     setIsDragging(true);
@@ -66,16 +62,6 @@ export const MapViewer: React.FC<MapViewerProps> = ({
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    // Update live cursor percentage coordinates
-    if (mapImageRef.current) {
-      const rect = mapImageRef.current.getBoundingClientRect();
-      const rawX = ((e.clientX - rect.left) / rect.width) * 100;
-      const rawY = ((e.clientY - rect.top) / rect.height) * 100;
-      const clampedX = Math.round(Math.max(0, Math.min(100, rawX)));
-      const clampedY = Math.round(Math.max(0, Math.min(100, rawY)));
-      setCursorCoords({ x: clampedX, y: clampedY });
-    }
-
     if (!isDragging) return;
     setPosition({
       x: e.clientX - dragStart.x,
@@ -85,11 +71,6 @@ export const MapViewer: React.FC<MapViewerProps> = ({
 
   const handleMouseUp = () => {
     setIsDragging(false);
-  };
-
-  const handleMouseLeave = () => {
-    setIsDragging(false);
-    setCursorCoords(null);
   };
 
   // Optional Smooth Wheel Zoom
@@ -111,27 +92,6 @@ export const MapViewer: React.FC<MapViewerProps> = ({
     setPosition({ x: 0, y: 0 });
   };
 
-  // Map Click handler to easily copy coordinates for villagers.ts
-  const handleMapClick = (e: React.MouseEvent) => {
-    if (!mapImageRef.current) return;
-    const rect = mapImageRef.current.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const clickY = e.clientY - rect.top;
-    const xPct = Math.round((clickX / rect.width) * 100);
-    const yPct = Math.round((clickY / rect.height) * 100);
-    if (xPct >= 0 && xPct <= 100 && yPct >= 0 && yPct <= 100) {
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(`x: ${xPct}, y: ${yPct}`);
-      }
-      setCopiedCoords({ x: xPct, y: yPct });
-      setTimeout(() => setCopiedCoords(null), 2500);
-    }
-  };
-
-  // Grid steps for 0-100% overlay
-  const majorSteps = [10, 20, 30, 40, 50, 60, 70, 80, 90];
-  const minorSteps = [5, 15, 25, 35, 45, 55, 65, 75, 85, 95];
-
   return (
     <div className="map-viewer-container" ref={containerRef}>
       {/* Interactive Viewport Canvas */}
@@ -140,7 +100,7 @@ export const MapViewer: React.FC<MapViewerProps> = ({
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseLeave}
+        onMouseLeave={handleMouseUp}
         onWheel={handleWheel}
         onDoubleClick={handleDoubleClick}
       >
@@ -151,7 +111,6 @@ export const MapViewer: React.FC<MapViewerProps> = ({
             transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
             transformOrigin: 'center center'
           }}
-          onClick={handleMapClick}
         >
           {/* Main Village Map Image (Full 16:9 view, uncropped) */}
           <img 
@@ -162,64 +121,7 @@ export const MapViewer: React.FC<MapViewerProps> = ({
             draggable={false}
           />
 
-          {/* Temporary Debug Coordinate Grid Overlay (0-100%) */}
-          <div className="debug-grid-container">
-            {/* SVG Grid Lines */}
-            <svg className="debug-grid-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
-              {/* Minor Grid Lines (every 5%) */}
-              {minorSteps.map((s) => (
-                <React.Fragment key={`minor-${s}`}>
-                  <line x1={s} y1={0} x2={s} y2={100} stroke="rgba(255, 255, 255, 0.2)" strokeWidth="0.12" strokeDasharray="0.6 0.6" />
-                  <line x1={0} y1={s} x2={100} y2={s} stroke="rgba(255, 255, 255, 0.2)" strokeWidth="0.12" strokeDasharray="0.6 0.6" />
-                </React.Fragment>
-              ))}
-
-              {/* Major Grid Lines (every 10%) */}
-              {majorSteps.map((s) => (
-                <React.Fragment key={`major-${s}`}>
-                  <line x1={s} y1={0} x2={s} y2={100} stroke="rgba(255, 255, 255, 0.5)" strokeWidth="0.2" />
-                  <line x1={0} y1={s} x2={100} y2={s} stroke="rgba(255, 255, 255, 0.5)" strokeWidth="0.2" />
-                </React.Fragment>
-              ))}
-
-              {/* 50% Center Axis Lines */}
-              <line x1={50} y1={0} x2={50} y2={100} stroke="#f59e0b" strokeWidth="0.35" strokeDasharray="1 1" />
-              <line x1={0} y1={50} x2={100} y2={50} stroke="#f59e0b" strokeWidth="0.35" strokeDasharray="1 1" />
-            </svg>
-
-            {/* X-Axis Percentage Labels across Top */}
-            <div className="debug-axis-labels-x">
-              {majorSteps.map((s) => (
-                <div key={`lbl-x-${s}`} className="debug-grid-label x-label" style={{ left: `${s}%` }}>
-                  {s}%
-                </div>
-              ))}
-            </div>
-
-            {/* Y-Axis Percentage Labels along Left */}
-            <div className="debug-axis-labels-y">
-              {majorSteps.map((s) => (
-                <div key={`lbl-y-${s}`} className="debug-grid-label y-label" style={{ top: `${s}%` }}>
-                  {s}%
-                </div>
-              ))}
-            </div>
-
-            {/* Live Cursor Coordinate Chip */}
-            {cursorCoords && (
-              <div 
-                className="debug-cursor-chip"
-                style={{
-                  left: `${cursorCoords.x}%`,
-                  top: `${cursorCoords.y}%`
-                }}
-              >
-                x: {cursorCoords.x} | y: {cursorCoords.y}
-              </div>
-            )}
-          </div>
-
-          {/* Render 20 Interactive Villager Structure Pins with Debug x/y Values */}
+          {/* Render 20 Interactive Villager Structure Pins (Preserving exact x/y positions) */}
           {villagers.map((v) => {
             const isBoat = v.id === 'fisherman';
             return (
@@ -237,11 +139,6 @@ export const MapViewer: React.FC<MapViewerProps> = ({
                   onSelectLocation(v);
                 }}
               >
-                {/* Debug Coordinate Badge Above Marker */}
-                <div className="pin-debug-coord-badge">
-                  x: {v.x} | y: {v.y}
-                </div>
-
                 <div className="pin-pulse-ring" />
                 <div className="pin-icon-badge">
                   {renderProfessionIcon(v.iconName, 14)}
@@ -259,14 +156,6 @@ export const MapViewer: React.FC<MapViewerProps> = ({
           })}
         </div>
       </div>
-
-      {/* Coordinate Copied Toast */}
-      {copiedCoords && (
-        <div className="debug-copied-toast">
-          <Check size={14} className="toast-icon" />
-          <span>Coordonnées copiées : <strong>x: {copiedCoords.x}, y: {copiedCoords.y}</strong></span>
-        </div>
-      )}
 
       {/* Hovered Location Quick Tooltip Card */}
       {hoveredVillager && (
