@@ -3,6 +3,7 @@ import { Castle, Users, Crosshair, Bot, Sparkles, Scroll } from 'lucide-react';
 
 interface HeaderNavProps {
   activeOverlay: ActiveOverlay;
+  isAIOpen?: boolean;
   onOpenOverlay: (overlay: ActiveOverlay) => void;
   inspectorMode: boolean;
   onToggleInspectorMode: () => void;
@@ -10,12 +11,13 @@ interface HeaderNavProps {
 
 export const HeaderNav: React.FC<HeaderNavProps> = ({
   activeOverlay,
+  isAIOpen = false,
   onOpenOverlay,
   inspectorMode,
   onToggleInspectorMode
 }) => {
   return (
-    <header className="villon-header">
+    <header className="villon-header relative z-[300]">
       {/* Brand & Title */}
       <div className="header-brand-section">
         <div className="brand-logo-badge">
@@ -48,9 +50,9 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
 
         {/* Villon AI Circle Trigger */}
         <button 
-          className={`circle-trigger-btn ${activeOverlay === 'ai' ? 'active' : ''}`}
+          className={`circle-trigger-btn ${isAIOpen ? 'active' : ''}`}
           onClick={() => onOpenOverlay('ai')}
-          title="Ouvrir l’assistant du village"
+          title="Ouvrir l’assistant du village & traducteur"
         >
           <div className="circle-inner ai-circle">
             <Bot size={26} />
@@ -81,3 +83,4 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
 };
 
 export default HeaderNav;
+
