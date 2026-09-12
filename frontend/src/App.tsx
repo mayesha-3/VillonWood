@@ -7,19 +7,22 @@ import Chatbot from './chatbot';
 import GroupChat from './groupChats';
 import { VILLAGERS_DATA } from './data/villagers';
 import type { VillagerProfession, ActiveOverlay } from './types/village';
+import { Bot, Sparkles } from 'lucide-react';
 
 export const App: React.FC = () => {
   const [activeOverlay, setActiveOverlay] = useState<ActiveOverlay>(null);
   const [selectedLocation, setSelectedLocation] = useState<VillagerProfession | null>(null);
+  const [isAIOpen, setIsAIOpen] = useState<boolean>(true);
 
   const handleSelectLocation = (location: VillagerProfession) => {
     setSelectedLocation(location);
   };
 
-  const handleNavigateToLocationFromAI = (locationId: string) => {
-    const loc = VILLAGERS_DATA.find((v) => v.id === locationId);
-    if (loc) {
-      setSelectedLocation(loc);
+  const handleOpenOverlay = (overlay: ActiveOverlay) => {
+    if (overlay === 'ai') {
+      setIsAIOpen((prev) => !prev);
+    } else {
+      setActiveOverlay(overlay);
     }
   };
 
@@ -39,20 +42,34 @@ export const App: React.FC = () => {
       {/* Frosted Glass Bottom Footer: Villon AI (Left) & Villon Media (Right) */}
       <FrostedFooter
         activeOverlay={activeOverlay}
-        onOpenOverlay={(overlay) => setActiveOverlay(overlay)}
+        onOpenOverlay={handleOpenOverlay}
       />
 
-      {/* Villon Media Overlay */}
+      {/* Villon Media (La Gazette de Villon) — Dedicated Page Overlay with Blurred Village Map Background */}
       {activeOverlay === 'media' && (
         <SocialMedia onClose={() => setActiveOverlay(null)} />
       )}
 
-      {/* Villon AI Overlay */}
-      {activeOverlay === 'ai' && (
-        <Chatbot 
-          onClose={() => setActiveOverlay(null)} 
-          onNavigateToLocation={handleNavigateToLocationFromAI}
-        />
+      {/* Transparent Floating AI Chatbot Popup (Right Corner z-250) — Always on top */}
+      <Chatbot
+        isOpen={isAIOpen}
+        onClose={() => setIsAIOpen(false)}
+      />
+
+      {/* Floating AI Trigger Fab Button (Visible when AI is closed) */}
+      {!isAIOpen && (
+        <button
+          type="button"
+          className="vai-fab-trigger"
+          onClick={() => setIsAIOpen(true)}
+          title="Ouvrir Villon AI"
+        >
+          <div className="vai-fab-inner">
+            <Bot size={22} />
+            <Sparkles size={11} className="vai-fab-sparkle" />
+          </div>
+          <span className="vai-fab-pulse" />
+        </button>
       )}
 
       {/* Location / Profession Group Chat Overlay (Bakery, Boat, Forge, etc.) */}
