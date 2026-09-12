@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import type { VillagerProfession } from '../types/village';
 import mapImage from '../assets/map.png';
 import { 
-  Crosshair, Users, MessageSquare, MapPin, Anchor, Flame, Cake, 
+  Users, MessageSquare, MapPin, Anchor, Flame, Cake, 
   Wheat, Wine, Cloud, Shield, Wind, Hammer, Disc, Beer, Scissors, 
   Footprints, Wrench, Box, Circle, Archive, Feather, Utensils
 } from 'lucide-react';
@@ -10,12 +10,10 @@ import {
 interface MapViewerProps {
   villagers: VillagerProfession[];
   onSelectLocation: (villager: VillagerProfession) => void;
-  inspectorMode: boolean;
-  onToggleInspectorMode: () => void;
 }
 
 // Icon helper function for professions
-const renderProfessionIcon = (iconName: string, size = 18) => {
+const renderProfessionIcon = (iconName: string, size = 16) => {
   switch (iconName) {
     case 'Wheat': return <Wheat size={size} />;
     case 'Wine': return <Wine size={size} />;
@@ -42,17 +40,13 @@ const renderProfessionIcon = (iconName: string, size = 18) => {
 
 export const MapViewer: React.FC<MapViewerProps> = ({
   villagers,
-  onSelectLocation,
-  inspectorMode,
-  onToggleInspectorMode
+  onSelectLocation
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapImageRef = useRef<HTMLImageElement>(null);
 
-  // Locked at 200% scale (2.0) as requested
-  const FIXED_SCALE = 2;
-
-  // Drag position state
+  // Full-map viewport: starts at 1.0 scale (entire map visible, uncropped)
+  const [scale, setScale] = useState<number>(1);
   const [position, setPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [dragStart, setDragStart] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -60,12 +54,9 @@ export const MapViewer: React.FC<MapViewerProps> = ({
   // Hover state for tooltip pin preview
   const [hoveredVillager, setHoveredVillager] = useState<VillagerProfession | null>(null);
 
-  // Inspector coordinate toast state
-  const [lastClickedCoords, setLastClickedCoords] = useState<{ x: number; y: number } | null>(null);
-
-  // Mouse Drag handlers
+  // Mouse Drag handlers (when scale > 1 or panning)
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (e.button !== 0) return; // Only primary click
+    if (e.button !== 0) return; // Primary click only
     setIsDragging(true);
     setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
   };
@@ -82,74 +73,55 @@ export const MapViewer: React.FC<MapViewerProps> = ({
     setIsDragging(false);
   };
 
-  // Map Click handler for Inspector Mode (Coordinates Picker)
-  const handleMapClick = (e: React.MouseEvent) => {
-    if (!inspectorMode || !mapImageRef.current) return;
-    const rect = mapImageRef.current.getBoundingClientRect();
-    
-    // Calculate click position as percentage of map image width and height
-    const clickX = e.clientX - rect.left;
-    const clickY = e.clientY - rect.top;
-    
-    const xPct = Math.round((clickX / rect.width) * 100);
-    const yPct = Math.round((clickY / rect.height) * 100);
+  // Optional Smooth Wheel Zoom
+  const handleWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+    const zoomFactor = e.deltaY < 0 ? 1.15 : 0.88;
+    setScale((prevScale) => {
+      const nextScale = Math.min(Math.max(prevScale * zoomFactor, 1), 3);
+      if (nextScale === 1) {
+        setPosition({ x: 0, y: 0 }); // reset center when fully zoomed out
+      }
+      return nextScale;
+    });
+  };
 
-    setLastClickedCoords({ x: xPct, y: yPct });
-
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(`x: ${xPct}, y: ${yPct}`);
-    }
+  // Double click resets zoom to full-map overview
+  const handleDoubleClick = () => {
+    setScale(1);
+    setPosition({ x: 0, y: 0 });
   };
 
   return (
     <div className="map-viewer-container" ref={containerRef}>
-      {/* Floating Toolbar for Inspector */}
-      <div className="map-controls-toolbar">
-        <button 
-          className={`map-btn inspector-btn ${inspectorMode ? 'active' : ''}`}
-          onClick={onToggleInspectorMode}
-          title="Activer l’inspecteur pour obtenir les coordonnées x et y"
-        >
-          <Crosshair size={18} />
-          <span>{inspectorMode ? 'Inspecteur activé' : 'Inspecter les coordonnées'}</span>
-        </button>
-      </div>
-
-      {/* Coordinate Toast when Inspector Clicked */}
-      {inspectorMode && lastClickedCoords && (
-        <div className="inspector-coord-toast">
-          <Crosshair size={16} />
-          <span>Coordonnées : <strong>x : {lastClickedCoords.x} %, y : {lastClickedCoords.y} %</strong></span>
-          <small>(Copiées dans le presse-papiers)</small>
-        </div>
-      )}
-
-      {/* Interactive Draggable Viewport - Always 200% scale */}
+      {/* Interactive Viewport Canvas */}
       <div 
-        className={`map-viewport ${isDragging ? 'is-dragging' : ''} ${inspectorMode ? 'is-inspecting' : ''}`}
+        className={`map-viewport ${isDragging ? 'is-dragging' : ''}`}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
+        onWheel={handleWheel}
+        onDoubleClick={handleDoubleClick}
       >
+        {/* Responsive 16:9 Aspect Ratio Map Stage */}
         <div 
-          className="map-transform-wrapper"
+          className="map-stage-wrapper"
           style={{
-            transform: `translate(${position.x}px, ${position.y}px) scale(${FIXED_SCALE})`,
+            transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
             transformOrigin: 'center center'
           }}
         >
-          {/* Main Village Map Image */}
+          {/* Main Village Map Image (Full 16:9 view, uncropped) */}
           <img 
             ref={mapImageRef}
             src={mapImage} 
             alt="Carte du village français ancien de VillonWood"
             className="village-map-image"
-            onClick={handleMapClick}
             draggable={false}
           />
 
-          {/* Render 20 Interactive Villager Structure Pins */}
+          {/* Render 20 Interactive Villager Structure Pins (Preserving exact x/y positions) */}
           {villagers.map((v) => {
             const isBoat = v.id === 'fisherman';
             return (

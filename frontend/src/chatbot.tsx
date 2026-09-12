@@ -12,7 +12,6 @@ import {
 interface ChatbotProps {
   isOpen: boolean;
   onClose: () => void;
-  onNavigateToLocation?: (locationId: string) => void;
 }
 
 interface Message {
@@ -69,26 +68,95 @@ export const Chatbot: React.FC<ChatbotProps> = ({
     if (!textOverride) setInputText('');
     setIsTyping(true);
 
-    // Simulate AI response after a short delay
     setTimeout(() => {
       const lower = text.toLowerCase();
       let reply = '';
 
-      if (lower.includes('bakery') || lower.includes('boulangerie') || lower.includes('bread') || lower.includes('pain')) {
-        reply = '🥖 "Bakery" se dit **la boulangerie** en français ! Jean-Luc Boulanger allume ses fours avant l\'aube chaque matin. Ses baguettes au levain sont légendaires !';
-      } else if (lower.includes('boat') || lower.includes('bateau') || lower.includes('river') || lower.includes('rivière')) {
-        reply = '⚓ "River" se dit **la rivière** ! Le Capitaine Jean et son équipage naviguent sur la rivière Villon pour pêcher truites et saumons frais.';
-      } else if (lower.includes('wine') || lower.includes('vin') || lower.includes('vineyard') || lower.includes('vignoble')) {
-        reply = '🍷 "Wine" se dit **le vin** ! Jacques du Clos élève un magnifique Pinot en fûts de chêne dans les caves du vignoble. Dégustation ce soir !';
-      } else if (lower.includes('hello') || lower.includes('bonjour') || lower.includes('hi') || lower.includes('salut')) {
-        reply = '👋 Bonjour et bienvenue à VillonWood ! Comment puis-je vous aider ? I can translate words, guide you around the village, or tell you about our artisans !';
-      } else if (lower.includes('translate') || lower.includes('traduire') || lower.includes('comment dit')) {
-        reply = '🌐 I\'d be happy to translate! Just type any word or sentence in English or French and I\'ll translate it for you with village context.';
-      } else if (lower.includes('forge') || lower.includes('blacksmith') || lower.includes('forgeron')) {
-        reply = '🔨 "Blacksmith" se dit **le forgeron** ! Maître Vulcain forge des outils, des lames et des cerclages sur son enclume incandescente.';
-      } else {
-        reply = `🏡 Merci pour votre message ! En tant que guide bilingue de VillonWood, je peux traduire des mots (EN ↔ FR), vous orienter vers les artisans du village, ou vous raconter l'histoire de nos métiers médiévaux. Que souhaitez-vous savoir ?`;
-      }
+if (
+  lower.includes("bakery") ||
+  lower.includes("boulangerie") ||
+  lower.includes("bread") ||
+  lower.includes("pain")
+) {
+  reply = `🥖 Le boulanger prépare du pain frais chaque matin.
+=> The baker prepares fresh bread every morning.
+
+le boulanger => the baker
+prépare => prepares
+du pain frais => fresh bread
+chaque matin => every morning`;
+} else if (
+  lower.includes("boat") ||
+  lower.includes("bateau") ||
+  lower.includes("river") ||
+  lower.includes("rivière")
+) {
+  reply = `⚓ Le capitaine navigue en bateau sur la rivière.
+=> The captain sails by boat on the river.
+
+le capitaine => the captain
+navigue => navigates / sails
+en bateau => by boat
+sur la rivière => on the river`;
+} else if (
+  lower.includes("wine") ||
+  lower.includes("vin") ||
+  lower.includes("vineyard") ||
+  lower.includes("vignoble")
+) {
+  reply = `🍷 Nous dégustons du bon vin dans le vignoble.
+=> We are tasting good wine in the vineyard.
+
+nous dégustons => we taste / we are tasting
+du bon vin => good wine
+dans => in
+le vignoble => the vineyard`;
+} else if (
+  lower.includes("hello") ||
+  lower.includes("bonjour") ||
+  lower.includes("hi") ||
+  lower.includes("salut")
+) {
+  reply = `👋 Bonjour monsieur le maire, bienvenue au village !
+=> Hello Mr. Mayor, welcome to the village!
+
+bonjour => hello / good morning
+monsieur => mister / sir
+le maire => the mayor
+bienvenue => welcome
+au village => to the village`;
+} else if (
+  lower.includes("translate") ||
+  lower.includes("traduire") ||
+  lower.includes("comment dit")
+) {
+  reply = `🌐 Pouvez-vous traduire cette phrase s'il vous plaît ?
+=> Can you translate this sentence please?
+
+pouvez-vous => can you
+traduire => to translate
+cette phrase => this sentence
+s'il vous plaît => please`;
+} else if (
+  lower.includes("forge") ||
+  lower.includes("blacksmith") ||
+  lower.includes("forgeron")
+) {
+  reply = `🔨 Le forgeron travaille le fer chaud dans sa forge.
+=> The blacksmith works hot iron in his forge.
+
+le forgeron => the blacksmith
+travaille => works
+le fer chaud => hot iron
+dans sa forge => in his forge`;
+} else {
+  reply = `🏡 Je visite un joli village aujourd'hui.
+=> I am visiting a pretty village today.
+
+je visite => I visit / I am visiting
+un joli village => a pretty village
+aujourd'hui => today`;
+}
 
       const aiMsg: Message = {
         id: `ai-${Date.now()}`,
@@ -103,11 +171,8 @@ export const Chatbot: React.FC<ChatbotProps> = ({
   };
 
   return (
-    <div
-      className="villon-ai-widget"
-      onClick={(e) => e.stopPropagation()}
-    >
-      {/* ── HEADER ── */}
+    <div className="villon-ai-widget" onClick={(e) => e.stopPropagation()}>
+      {/* HEADER */}
       <div className="vai-header">
         <div className="vai-header-left">
           <div className="vai-avatar-ring">
@@ -125,40 +190,23 @@ export const Chatbot: React.FC<ChatbotProps> = ({
             </p>
           </div>
         </div>
-
         <div className="vai-header-actions">
-          <button className="vai-header-btn" onClick={onClose} title="Minimize">
-            <Minimize2 size={14} />
-          </button>
-          <button className="vai-header-btn vai-close-btn" onClick={onClose} title="Close">
-            <X size={15} />
-          </button>
+          <button className="vai-header-btn" onClick={onClose} title="Minimize"><Minimize2 size={14} /></button>
+          <button className="vai-header-btn vai-close-btn" onClick={onClose} title="Close"><X size={15} /></button>
         </div>
       </div>
 
-      {/* ── LANGUAGE BADGE BAR ── */}
+      {/* LANGUAGE BADGE BAR */}
       <div className="vai-lang-bar">
-        <div className="vai-lang-badge">
-          <Languages size={12} />
-          <span>Traducteur bilingue</span>
-        </div>
-        <div className="vai-lang-badge vai-lang-active">
-          <span>EN ↔ FR</span>
-        </div>
+        <div className="vai-lang-badge"><Languages size={12} /><span>Traducteur bilingue</span></div>
+        <div className="vai-lang-badge vai-lang-active"><span>EN ↔ FR</span></div>
       </div>
 
-      {/* ── MESSAGES ── */}
+      {/* MESSAGES */}
       <div className="vai-messages">
         {messages.map((m) => (
-          <div
-            key={m.id}
-            className={`vai-msg ${m.sender === 'user' ? 'vai-msg-user' : 'vai-msg-ai'}`}
-          >
-            {m.sender === 'ai' && (
-              <div className="vai-msg-avatar">
-                <Bot size={14} />
-              </div>
-            )}
+          <div key={m.id} className={`vai-msg ${m.sender === 'user' ? 'vai-msg-user' : 'vai-msg-ai'}`}>
+            {m.sender === 'ai' && (<div className="vai-msg-avatar"><Bot size={14} /></div>)}
             <div className="vai-bubble-wrap">
               <div className={`vai-bubble ${m.sender === 'user' ? 'vai-bubble-user' : 'vai-bubble-ai'}`}>
                 <p className="vai-bubble-text">{m.text}</p>
@@ -167,27 +215,18 @@ export const Chatbot: React.FC<ChatbotProps> = ({
             </div>
           </div>
         ))}
-
-        {/* Typing indicator */}
         {isTyping && (
           <div className="vai-msg vai-msg-ai">
-            <div className="vai-msg-avatar">
-              <Bot size={14} />
-            </div>
+            <div className="vai-msg-avatar"><Bot size={14} /></div>
             <div className="vai-bubble vai-bubble-ai vai-typing-bubble">
-              <div className="vai-typing-dots">
-                <span />
-                <span />
-                <span />
-              </div>
+              <div className="vai-typing-dots"><span /><span /><span /></div>
             </div>
           </div>
         )}
-
         <div ref={messagesEndRef} />
       </div>
 
-      {/* ── QUICK PROMPTS ── */}
+      {/* QUICK PROMPTS */}
       <div className="vai-quick-prompts">
         {[
           { emoji: '🥖', text: 'Where is the bakery?' },
@@ -195,41 +234,17 @@ export const Chatbot: React.FC<ChatbotProps> = ({
           { emoji: '👋', text: 'Bonjour !' },
           { emoji: '⚓', text: 'Tell me about the river' },
         ].map((p, i) => (
-          <button
-            key={i}
-            type="button"
-            className="vai-prompt-chip"
-            onClick={() => handleSend(`${p.emoji} ${p.text}`)}
-          >
+          <button key={i} type="button" className="vai-prompt-chip" onClick={() => handleSend(`${p.emoji} ${p.text}`)}>
             <span className="vai-chip-emoji">{p.emoji}</span>
             <span>{p.text}</span>
           </button>
         ))}
       </div>
 
-      {/* ── INPUT ── */}
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleSend();
-        }}
-        className="vai-input-bar"
-      >
-        <input
-          type="text"
-          className="vai-input"
-          placeholder="Type in English or French..."
-          value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
-        />
-        <button
-          type="submit"
-          className="vai-send-btn"
-          disabled={!inputText.trim()}
-          title="Send"
-        >
-          <Send size={16} />
-        </button>
+      {/* INPUT */}
+      <form onSubmit={(e) => { e.preventDefault(); handleSend(); }} className="vai-input-bar">
+        <input type="text" className="vai-input" placeholder="Type in English or French..." value={inputText} onChange={(e) => setInputText(e.target.value)} />
+        <button type="submit" className="vai-send-btn" disabled={!inputText.trim()} title="Send"><Send size={16} /></button>
       </form>
     </div>
   );
