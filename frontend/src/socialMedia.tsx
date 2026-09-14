@@ -162,13 +162,13 @@ export const SocialMedia: React.FC<SocialMediaProps> = ({ onClose }) => {
 
   return (
     <div
-      className={`fixed inset-0 z-[200] flex items-center justify-center p-4 overflow-hidden transition-opacity duration-300 ${unrollPhase === 'closing' ? 'opacity-0' : 'opacity-100'}`}
+      style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', overflow: 'hidden', transition: 'opacity 0.3s ease', opacity: unrollPhase === 'closing' ? 0 : 1 }}
       onClick={handleClose}
     >
-      <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${mapImage})`, filter: 'blur(12px)', transform: 'scale(1.05)' }} />
-      <div className="absolute inset-0 bg-[#2b1708]/60" />
+      <div style={{ position: 'absolute', inset: 0, backgroundImage: `url(${mapImage})`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'blur(12px)', transform: 'scale(1.05)' }} />
+      <div style={{ position: 'absolute', inset: 0, background: 'rgba(43, 23, 8, 0.6)' }} />
 
-      <div className={`villon-scroll-wrapper relative z-10 phase-${unrollPhase}`} onClick={(e) => e.stopPropagation()}>
+      <div className={`villon-scroll-wrapper relative z-10 phase-${unrollPhase}`} style={{ marginLeft: '10vw' }} onClick={(e) => e.stopPropagation()}>
         <div className="scroll-roller scroll-roller-top">
           <div className="roller-finial finial-left"><div className="finial-tip" /><div className="finial-ball" /></div>
           <div className="roller-bar"><div className="roller-brass-ring ring-left" /><div className="roller-wood-core" /><div className="roller-brass-ring ring-right" /></div>
