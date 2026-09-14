@@ -389,6 +389,104 @@ body, html {
   box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
 }
 
+/* HUD User Identity Bar (top of plate) */
+.ff-user-bar {
+  display: flex; align-items: center; gap: 7px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed rgba(245, 158, 11, 0.2);
+}
+.ff-user-avatar-mini {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: rgba(245, 158, 11, 0.25); border: 1px solid #f59e0b;
+  display: flex; align-items: center; justify-content: center;
+  color: #fbbf24; flex-shrink: 0;
+}
+.ff-user-name {
+  font-size: 10px; font-weight: 700; color: #fbbf24;
+  letter-spacing: 0.5px; overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap; max-width: 220px;
+}
+.ff-login-btn {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 6px; padding: 4px 12px;
+  color: #fbbf24; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.5px; cursor: pointer;
+  transition: all 0.2s ease; font-family: var(--font-body);
+}
+.ff-login-btn:hover {
+  background: rgba(245, 158, 11, 0.3);
+  border-color: #f59e0b; transform: translateY(-1px);
+}
+
+/* HUD Actions Bar (bottom of plate) */
+.ff-actions-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding-top: 6px;
+  border-top: 1px dashed rgba(245, 158, 11, 0.2);
+}
+.ff-action-btn {
+  display: flex; align-items: center; gap: 5px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: 6px; padding: 4px 10px;
+  color: rgba(255, 220, 180, 0.65);
+  font-size: 9px; font-weight: 600; letter-spacing: 0.3px;
+  cursor: pointer; transition: all 0.2s ease;
+}
+.ff-action-btn:hover {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24; border-color: rgba(245, 158, 11, 0.4);
+}
+.ff-logout-btn:hover {
+  background: rgba(180, 30, 30, 0.25);
+  color: #f87171; border-color: rgba(220, 50, 50, 0.35);
+}
+
+/* HUD Settings Dropdown */
+.ff-settings-dropdown {
+  margin-top: 8px;
+  background: linear-gradient(145deg, rgba(22, 16, 12, 0.95) 0%, rgba(35, 23, 16, 0.92) 100%);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 10px; padding: 12px 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  display: flex; flex-direction: column; gap: 8px;
+  animation: fadeIn 0.2s ease;
+}
+.ff-settings-label {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.8px;
+  color: rgba(255, 220, 180, 0.6); text-transform: uppercase;
+}
+.ff-settings-input-row {
+  display: flex; align-items: center; gap: 6px;
+}
+.ff-settings-input {
+  flex: 1; background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 6px; padding: 7px 10px;
+  color: #f0e4ce; font-size: 12px; font-family: var(--font-body);
+  outline: none; transition: border-color 0.2s;
+}
+.ff-settings-input:focus { border-color: #f59e0b; }
+.ff-settings-input::placeholder { color: rgba(180, 150, 110, 0.4); }
+.ff-settings-save, .ff-settings-cancel {
+  width: 28px; height: 28px; border-radius: 6px; border: none;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.2s ease; flex-shrink: 0;
+}
+.ff-settings-save {
+  background: rgba(34, 197, 94, 0.2); color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+.ff-settings-save:hover { background: rgba(34, 197, 94, 0.35); }
+.ff-settings-cancel {
+  background: rgba(180, 30, 30, 0.2); color: #f87171;
+  border: 1px solid rgba(220, 50, 50, 0.25);
+}
+.ff-settings-cancel:hover { background: rgba(180, 30, 30, 0.35); }
+
 
 /* ==========================================================================
    FROSTED GLASS BOTTOM FOOTER (Villon AI on Left, Villon Media on Right)
