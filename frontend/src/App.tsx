@@ -50,7 +50,7 @@ export const App: React.FC = () => {
   return (
     <div className="villon-app-layout">
       {/* Top-Left Tactical Videogame HUD */}
-      <GameHUDTopLeft totalVillagers={VILLAGERS_DATA.length} />
+      <GameHUDTopLeft totalVillagers={VILLAGERS_DATA.length} onLogin={() => setShowAuthModal(true)} />
 
       {/* Main Interactive Map Viewport */}
       <main className="main-content-viewport">
