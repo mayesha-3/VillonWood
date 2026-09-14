@@ -5,20 +5,32 @@ import MapViewer from './components/MapViewer';
 import SocialMedia from './socialMedia';
 import Chatbot from './chatbot';
 import GroupChat from './groupChats';
+import AuthModal from './components/AuthModal';
+import { useAuth } from './contexts/AuthContext';
 import { VILLAGERS_DATA } from './data/villagers';
 import type { VillagerProfession, ActiveOverlay } from './types/village';
 import { Bot, Sparkles } from 'lucide-react';
 
 export const App: React.FC = () => {
+  const { user, loading } = useAuth();
   const [activeOverlay, setActiveOverlay] = useState<ActiveOverlay>(null);
   const [selectedLocation, setSelectedLocation] = useState<VillagerProfession | null>(null);
-  const [isAIOpen, setIsAIOpen] = useState<boolean>(true);
+  const [isAIOpen, setIsAIOpen] = useState<boolean>(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const handleSelectLocation = (location: VillagerProfession) => {
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
     setSelectedLocation(location);
   };
 
   const handleOpenOverlay = (overlay: ActiveOverlay) => {
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
     if (overlay === 'ai') {
       setIsAIOpen((prev) => !prev);
     } else {
@@ -26,12 +38,21 @@ export const App: React.FC = () => {
     }
   };
 
+
+  if (loading) {
+    return (
+      <div className="villon-app-layout" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="auth-spinner" style={{ width: 36, height: 36 }} />
+      </div>
+    );
+  }
+
   return (
     <div className="villon-app-layout">
-      {/* Top-Left Tactical Videogame HUD (Free Fire Style): Logo & Active Villagers */}
+      {/* Top-Left Tactical Videogame HUD */}
       <GameHUDTopLeft totalVillagers={VILLAGERS_DATA.length} />
 
-      {/* Main Interactive Map Viewport (Draggable & Zoomable - Full Viewport) */}
+      {/* Main Interactive Map Viewport */}
       <main className="main-content-viewport">
         <MapViewer
           villagers={VILLAGERS_DATA}
@@ -39,25 +60,27 @@ export const App: React.FC = () => {
         />
       </main>
 
-      {/* Frosted Glass Bottom Footer: Villon AI (Left) & Villon Media (Right) */}
+      {/* Frosted Glass Bottom Footer */}
       <FrostedFooter
         activeOverlay={activeOverlay}
         onOpenOverlay={handleOpenOverlay}
       />
 
-      {/* Villon Media (La Gazette de Villon) — Dedicated Page Overlay with Blurred Village Map Background */}
-      {activeOverlay === 'media' && (
+      {/* Gated: Villon Media */}
+      {user && activeOverlay === 'media' && (
         <SocialMedia onClose={() => setActiveOverlay(null)} />
       )}
 
-      {/* Transparent Floating AI Chatbot Popup (Right Corner z-250) — Always on top */}
-      <Chatbot
-        isOpen={isAIOpen}
-        onClose={() => setIsAIOpen(false)}
-      />
+      {/* Gated: Floating AI Chatbot */}
+      {user && (
+        <Chatbot
+          isOpen={isAIOpen}
+          onClose={() => setIsAIOpen(false)}
+        />
+      )}
 
-      {/* Floating AI Trigger Fab Button (Visible when AI is closed) */}
-      {!isAIOpen && (
+      {/* Gated: Floating AI Trigger Fab */}
+      {user && !isAIOpen && (
         <button
           type="button"
           className="vai-fab-trigger"
@@ -72,12 +95,33 @@ export const App: React.FC = () => {
         </button>
       )}
 
-      {/* Location / Profession Group Chat Overlay (Bakery, Boat, Forge, etc.) */}
-      {selectedLocation && (
+      {/* Non-logged-in FAB that prompts auth */}
+      {!user && (
+        <button
+          type="button"
+          className="vai-fab-trigger"
+          onClick={() => setShowAuthModal(true)}
+          title="Connexion requise"
+        >
+          <div className="vai-fab-inner">
+            <Bot size={22} />
+            <Sparkles size={11} className="vai-fab-sparkle" />
+          </div>
+          <span className="vai-fab-pulse" />
+        </button>
+      )}
+
+      {/* Gated: Group Chat */}
+      {user && selectedLocation && (
         <GroupChat
           location={selectedLocation}
           onClose={() => setSelectedLocation(null)}
         />
+      )}
+
+      {/* Auth Modal Popup */}
+      {showAuthModal && (
+        <AuthModal onClose={() => setShowAuthModal(false)} />
       )}
     </div>
   );
