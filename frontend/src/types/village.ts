@@ -28,9 +28,11 @@ export interface VillagerProfession {
   description: string;
   defaultQuote: string;
   avatar: string;
+  bgImage?: string;
   iconName: string;
   activeOccupantsCount: number;
   sampleMessages: ChatMessage[];
 }
 
-export type ActiveOverlay = 'media' | 'ai' | 'chat' | null;
+export type ActiveOverlay = 'media' | 'ai' | 'chat' | 'camera' | 'music' | 'settings' | null;
+

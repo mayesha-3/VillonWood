@@ -54,6 +54,18 @@ export const MapViewer: React.FC<MapViewerProps> = ({
   // Hover state for tooltip pin preview
   const [hoveredVillager, setHoveredVillager] = useState<VillagerProfession | null>(null);
 
+  const getClampedPosition = (newX: number, newY: number, currentScale: number) => {
+    if (!containerRef.current) return { x: 0, y: 0 };
+    const { clientWidth, clientHeight } = containerRef.current;
+    const maxShiftX = Math.max(0, ((currentScale - 1) * clientWidth) / 2);
+    const maxShiftY = Math.max(0, ((currentScale - 1) * clientHeight) / 2);
+
+    return {
+      x: Math.min(Math.max(newX, -maxShiftX), maxShiftX),
+      y: Math.min(Math.max(newY, -maxShiftY), maxShiftY)
+    };
+  };
+
   // Mouse Drag handlers (when scale > 1 or panning)
   const handleMouseDown = (e: React.MouseEvent) => {
     if (e.button !== 0) return; // Primary click only
@@ -63,10 +75,9 @@ export const MapViewer: React.FC<MapViewerProps> = ({
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDragging) return;
-    setPosition({
-      x: e.clientX - dragStart.x,
-      y: e.clientY - dragStart.y
-    });
+    const rawX = e.clientX - dragStart.x;
+    const rawY = e.clientY - dragStart.y;
+    setPosition(getClampedPosition(rawX, rawY, scale));
   };
 
   const handleMouseUp = () => {
@@ -80,7 +91,9 @@ export const MapViewer: React.FC<MapViewerProps> = ({
     setScale((prevScale) => {
       const nextScale = Math.min(Math.max(prevScale * zoomFactor, 1), 3);
       if (nextScale === 1) {
-        setPosition({ x: 0, y: 0 }); // reset center when fully zoomed out
+        setPosition({ x: 0, y: 0 });
+      } else {
+        setPosition((prevPos) => getClampedPosition(prevPos.x, prevPos.y, nextScale));
       }
       return nextScale;
     });
@@ -146,7 +159,7 @@ export const MapViewer: React.FC<MapViewerProps> = ({
 
                 {/* Hotspot Label & Live People Badge */}
                 <div className="pin-title-label">
-                  <span className="pin-name">{v.name.split(' ')[0]}</span>
+                  <span className="pin-name">{v.name}</span>
                   <span className="pin-occupants">
                     <Users size={10} /> {v.activeOccupantsCount}
                   </span>
@@ -160,6 +173,11 @@ export const MapViewer: React.FC<MapViewerProps> = ({
       {/* Hovered Location Quick Tooltip Card */}
       {hoveredVillager && (
         <div className="hover-tooltip-card">
+          {hoveredVillager.bgImage && (
+            <div className="tooltip-img-wrapper">
+              <img src={hoveredVillager.bgImage} alt={hoveredVillager.name} className="tooltip-bg-preview" />
+            </div>
+          )}
           <div className="tooltip-header">
             <img src={hoveredVillager.avatar} alt={hoveredVillager.characterName} className="tooltip-avatar" />
             <div>
