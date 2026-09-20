@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { VillagerProfession, ChatMessage } from './types/village';
-import { X, Send, Users, Anchor, MapPin, MessageCircle } from 'lucide-react';
+import { X, Send, Anchor, MapPin } from 'lucide-react';
 
 interface GroupChatProps {
   location: VillagerProfession | null;
@@ -13,8 +13,6 @@ export const GroupChat: React.FC<GroupChatProps> = ({ location, onClose }) => {
 
   if (!location) return null;
 
-  const occupantsCount = location.activeOccupantsCount;
-
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputText.trim()) return;
@@ -22,7 +20,7 @@ export const GroupChat: React.FC<GroupChatProps> = ({ location, onClose }) => {
     const newMsg: ChatMessage = {
       id: `user-msg-${Date.now()}`,
       sender: 'Vous (voyageur)',
-      avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=YouTraveler',
+      avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=YouTraveler',
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       text: inputText.trim(),
       isUser: true
@@ -31,10 +29,8 @@ export const GroupChat: React.FC<GroupChatProps> = ({ location, onClose }) => {
     setMessages((prev) => [...prev, newMsg]);
     setInputText('');
 
-    // Trigger simulated response from the master villager or shop occupant after 1 second
     setTimeout(() => {
       let replyText: string;
-      
       if (location.id === 'baker') {
         replyText = `Ah, elles sortent du four ! Goûtez donc notre baguette au levain encore chaude pendant que vous discutez à la boulangerie !`;
       } else if (location.id === 'fisherman') {
@@ -43,6 +39,8 @@ export const GroupChat: React.FC<GroupChatProps> = ({ location, onClose }) => {
         replyText = `Attention aux étincelles autour de l’enclume ! Avez-vous besoin d’armes ou de fers à cheval aujourd’hui ?`;
       } else if (location.id === 'innkeeper') {
         replyText = `Bienvenue au Sanglier d’or ! Servez-vous une chope de bière et prenez place sur un tabouret près du feu.`;
+      } else if (location.id === 'barber') {
+        replyText = `Prenez place dans le fauteuil ! Une serviette chaude et un parfum de romarin pour commencer la journée ?`;
       } else {
         replyText = `${location.characterName} dit : « ${location.defaultQuote} »`;
       }
@@ -63,87 +61,77 @@ export const GroupChat: React.FC<GroupChatProps> = ({ location, onClose }) => {
   const isBoat = location.id === 'fisherman';
 
   return (
-    <div className="overlay-backdrop" onClick={onClose}>
-      <div className="group-chat-modal" onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
-        <div className="chat-modal-header">
-          <div className="header-left">
-            <div className="shop-icon-wrapper">
-              {isBoat ? <Anchor size={24} className="boat-icon" /> : <MapPin size={24} />}
+    <div 
+      className="overlay-backdrop place-chat-overlay" 
+      onClick={onClose}
+      style={{
+        backgroundImage: location.bgImage 
+          ? `linear-gradient(rgba(239, 223, 208, 0.18), rgba(211, 162, 113, 0.35)), url(${location.bgImage})` 
+          : undefined,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      <div className="floating-chat-container" onClick={(e) => e.stopPropagation()}>
+        {/* Minimal Floating Top Header */}
+        <div className="minimal-chat-header">
+          <div className="header-info-pill">
+            <div className="place-icon-badge">
+              {isBoat ? <Anchor size={18} /> : <MapPin size={18} />}
             </div>
-            <div>
-              <div className="shop-category">{location.category} • {location.frenchTitle}</div>
-              <h2 className="shop-title">{location.structureName}</h2>
-              <div className="shop-subinfo">
-                <span className="occupants-badge">
-                  <Users size={14} /> {occupantsCount} personnes présentes actuellement
-                </span>
-                <span className="master-villager">
-                  Responsable : <strong>{location.characterName}</strong>
-                </span>
+            <div className="place-titles">
+              <h2 className="minimal-place-name">{location.structureName}</h2>
+              <div className="minimal-sub">
+                <span className="online-dot" />
+                <span>{location.activeOccupantsCount} en ligne</span>
+                <span className="dot-sep">•</span>
+                <span>Responsable: {location.characterName}</span>
               </div>
             </div>
           </div>
 
-          <button className="close-modal-btn" onClick={onClose} title="Fermer la discussion du lieu">
-            <X size={20} />
+          <button className="minimal-close-btn" onClick={onClose} title="Fermer la discussion">
+            <X size={18} />
           </button>
         </div>
 
-        {/* Structure Banner / Quote */}
-        <div className="structure-banner">
-          <img src={location.avatar} alt={location.characterName} className="banner-avatar" />
-          <div className="banner-text">
-            <p>"{location.defaultQuote}"</p>
-            <small>{location.description}</small>
-          </div>
-        </div>
-
-        {/* Live Group Chat Messages List */}
-        <div className="chat-messages-container">
-          <div className="chat-welcome-notice">
-            <MessageCircle size={16} />
-            <span>Vous êtes entré dans la discussion en direct de <strong>{location.structureName}</strong>. Dites bonjour à tout le monde !</span>
-          </div>
-
+        {/* High-Readability Floating Conversation Area */}
+        <div className="floating-chat-messages">
           {messages.map((msg) => (
             <div 
               key={msg.id} 
-              className={`chat-bubble-wrapper ${msg.isUser ? 'user-wrapper' : 'villager-wrapper'}`}
+              className={`floating-bubble-row ${msg.isUser ? 'is-user' : 'is-villager'}`}
             >
               {!msg.isUser && (
-                <img src={msg.avatar} alt={msg.sender} className="chat-avatar" />
+                <img src={msg.avatar} alt={msg.sender} className="floating-avatar" />
               )}
-              <div className="chat-bubble">
-                <div className="bubble-sender-info">
-                  <span className="sender-name">{msg.sender}</span>
-                  {msg.role && <span className="sender-role">{msg.role}</span>}
-                  <span className="message-time">{msg.time}</span>
+              <div className="floating-bubble-content">
+                <div className="floating-bubble-meta">
+                  <span className="floating-sender">{msg.sender}</span>
+                  {msg.role && <span className="floating-role">{msg.role}</span>}
+                  <span className="floating-time">{msg.time}</span>
                 </div>
-                <div className="bubble-text">{msg.text}</div>
+                <div className="floating-bubble-text">{msg.text}</div>
               </div>
               {msg.isUser && (
-                <img src={msg.avatar} alt="Vous" className="chat-avatar user-avatar" />
+                <img src={msg.avatar} alt="Vous" className="floating-avatar" />
               )}
             </div>
           ))}
         </div>
 
-        {/* Message Input Bar */}
-        <form onSubmit={handleSendMessage} className="chat-input-form">
+        {/* Floating Messenger Input Bar */}
+        <form onSubmit={handleSendMessage} className="floating-chat-input-form">
           <input
             type="text"
-            className="chat-input"
-            placeholder={
-              isBoat 
-                ? "Discutez avec les personnes à bord..." 
-                : `Discutez avec tout le monde à ${location.name.split('/')[0]}...`
-            }
+            className="floating-chat-input"
+            placeholder={`Discutez avec tout le monde à ${location.name}...`}
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
           />
-          <button type="submit" className="chat-send-btn" disabled={!inputText.trim()}>
-            <Send size={18} />
+          <button type="submit" className="floating-send-btn" disabled={!inputText.trim()}>
+            <Send size={16} />
             <span>Envoyer</span>
           </button>
         </form>

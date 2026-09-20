@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import GameHUDTopLeft from './components/GameHUDTopLeft';
-import FrostedFooter from './components/FrostedFooter';
+import SidebarDock from './components/SidebarDock';
 import MapViewer from './components/MapViewer';
 import SocialMedia from './socialMedia';
+import CameraOverlay from './components/CameraOverlay';
+import MusicPlayerOverlay from './components/MusicPlayerOverlay';
+import SettingsOverlay from './components/SettingsOverlay';
 import Chatbot from './chatbot';
 import GroupChat from './groupChats';
 import AuthModal from './components/AuthModal';
 import { useAuth } from './contexts/AuthContext';
 import { VILLAGERS_DATA } from './data/villagers';
 import type { VillagerProfession, ActiveOverlay } from './types/village';
-import { Bot, Sparkles } from 'lucide-react';
+import { Feather, Sparkles } from 'lucide-react';
 
 export const App: React.FC = () => {
   const { user, loading } = useAuth();
@@ -17,6 +20,7 @@ export const App: React.FC = () => {
   const [selectedLocation, setSelectedLocation] = useState<VillagerProfession | null>(null);
   const [isAIOpen, setIsAIOpen] = useState<boolean>(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showHUD, setShowHUD] = useState<boolean>(false);
 
   const handleSelectLocation = (location: VillagerProfession) => {
     if (!user) {
@@ -38,7 +42,6 @@ export const App: React.FC = () => {
     }
   };
 
-
   if (loading) {
     return (
       <div className="villon-app-layout" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -49,10 +52,13 @@ export const App: React.FC = () => {
 
   return (
     <div className="villon-app-layout">
-      {/* Top-Left Tactical Videogame HUD */}
-      <GameHUDTopLeft totalVillagers={VILLAGERS_DATA.length} onLogin={() => setShowAuthModal(true)} />
-
-      {/* Main Interactive Map Viewport */}
+     
+      {showHUD && (
+        <GameHUDTopLeft 
+          totalVillagers={VILLAGERS_DATA.length} 
+          onLogin={() => setShowAuthModal(true)} 
+        />
+      )}
       <main className="main-content-viewport">
         <MapViewer
           villagers={VILLAGERS_DATA}
@@ -60,18 +66,31 @@ export const App: React.FC = () => {
         />
       </main>
 
-      {/* Frosted Glass Bottom Footer */}
-      <FrostedFooter
+  
+      <SidebarDock
         activeOverlay={activeOverlay}
         onOpenOverlay={handleOpenOverlay}
+        showHUD={showHUD}
+        onToggleHUD={() => setShowHUD((prev) => !prev)}
       />
 
-      {/* Gated: Villon Media */}
       {user && activeOverlay === 'media' && (
         <SocialMedia onClose={() => setActiveOverlay(null)} />
       )}
+      {user && activeOverlay === 'camera' && (
+        <CameraOverlay onClose={() => setActiveOverlay(null)} />
+      )}
+      {user && activeOverlay === 'music' && (
+        <MusicPlayerOverlay onClose={() => setActiveOverlay(null)} />
+      )}
+      {user && activeOverlay === 'settings' && (
+        <SettingsOverlay
+          onClose={() => setActiveOverlay(null)}
+          showHUD={showHUD}
+          onToggleHUD={() => setShowHUD((prev) => !prev)}
+        />
+      )}
 
-      {/* Gated: Floating AI Chatbot */}
       {user && (
         <Chatbot
           isOpen={isAIOpen}
@@ -79,7 +98,6 @@ export const App: React.FC = () => {
         />
       )}
 
-      {/* Gated: Floating AI Trigger Fab */}
       {user && !isAIOpen && (
         <button
           type="button"
@@ -88,7 +106,7 @@ export const App: React.FC = () => {
           title="Ouvrir Villon AI"
         >
           <div className="vai-fab-inner">
-            <Bot size={22} />
+            <Feather size={22} />
             <Sparkles size={11} className="vai-fab-sparkle" />
           </div>
           <span className="vai-fab-pulse" />
@@ -104,14 +122,13 @@ export const App: React.FC = () => {
           title="Connexion requise"
         >
           <div className="vai-fab-inner">
-            <Bot size={22} />
+            <Feather size={22} />
             <Sparkles size={11} className="vai-fab-sparkle" />
           </div>
           <span className="vai-fab-pulse" />
         </button>
       )}
 
-      {/* Gated: Group Chat */}
       {user && selectedLocation && (
         <GroupChat
           location={selectedLocation}
@@ -119,7 +136,6 @@ export const App: React.FC = () => {
         />
       )}
 
-      {/* Auth Modal Popup */}
       {showAuthModal && (
         <AuthModal onClose={() => setShowAuthModal(false)} />
       )}
