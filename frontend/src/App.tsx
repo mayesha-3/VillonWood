@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import GameHUDTopLeft from './components/GameHUDTopLeft';
 import SidebarDock from './components/SidebarDock';
 import MapViewer from './components/MapViewer';
@@ -6,16 +7,22 @@ import SocialMedia from './socialMedia';
 import CameraOverlay from './components/CameraOverlay';
 import MusicPlayerOverlay from './components/MusicPlayerOverlay';
 import SettingsOverlay from './components/SettingsOverlay';
+import AdminDashboard from './components/AdminDashboard';
+import RestrictedBanner from './components/RestrictedBanner';
 import Chatbot from './chatbot';
 import GroupChat from './groupChats';
 import AuthModal from './components/AuthModal';
 import { useAuth } from './contexts/AuthContext';
+import { useAdmin } from './contexts/AdminContext';
 import { VILLAGERS_DATA } from './data/villagers';
 import type { VillagerProfession, ActiveOverlay } from './types/village';
 import { Feather, Sparkles } from 'lucide-react';
 
-export const App: React.FC = () => {
+const VillageView: React.FC = () => {
   const { user, loading } = useAuth();
+  const { isCurrentUserRestricted } = useAdmin();
+  const navigate = useNavigate();
+
   const [activeOverlay, setActiveOverlay] = useState<ActiveOverlay>(null);
   const [selectedLocation, setSelectedLocation] = useState<VillagerProfession | null>(null);
   const [isAIOpen, setIsAIOpen] = useState<boolean>(false);
@@ -37,6 +44,8 @@ export const App: React.FC = () => {
     }
     if (overlay === 'ai') {
       setIsAIOpen((prev) => !prev);
+    } else if (overlay === 'admin') {
+      navigate('/mod');
     } else {
       setActiveOverlay(overlay);
     }
@@ -52,13 +61,15 @@ export const App: React.FC = () => {
 
   return (
     <div className="villon-app-layout">
-     
+      {isCurrentUserRestricted && <RestrictedBanner />}
+
       {showHUD && (
         <GameHUDTopLeft 
           totalVillagers={VILLAGERS_DATA.length} 
           onLogin={() => setShowAuthModal(true)} 
         />
       )}
+
       <main className="main-content-viewport">
         <MapViewer
           villagers={VILLAGERS_DATA}
@@ -66,7 +77,6 @@ export const App: React.FC = () => {
         />
       </main>
 
-  
       <SidebarDock
         activeOverlay={activeOverlay}
         onOpenOverlay={handleOpenOverlay}
@@ -88,6 +98,7 @@ export const App: React.FC = () => {
           onClose={() => setActiveOverlay(null)}
           showHUD={showHUD}
           onToggleHUD={() => setShowHUD((prev) => !prev)}
+          onOpenAdminDashboard={() => navigate('/mod')}
         />
       )}
 
@@ -113,7 +124,6 @@ export const App: React.FC = () => {
         </button>
       )}
 
-      {/* Non-logged-in FAB that prompts auth */}
       {!user && (
         <button
           type="button"
@@ -140,6 +150,20 @@ export const App: React.FC = () => {
         <AuthModal onClose={() => setShowAuthModal(false)} />
       )}
     </div>
+  );
+};
+
+const ModPage: React.FC = () => {
+  const navigate = useNavigate();
+  return <AdminDashboard onBackToMap={() => navigate('/')} />;
+};
+
+export const App: React.FC = () => {
+  return (
+    <Routes>
+      <Route path="/" element={<VillageView />} />
+      <Route path="/mod" element={<ModPage />} />
+    </Routes>
   );
 };
 

@@ -16,6 +16,9 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import mapImage from './assets/map.png';
+import { useLanguage } from './contexts/LanguageContext';
+
+const ALL_CATEGORY = 'all';
 
 interface SocialMediaProps {
   onClose: () => void;
@@ -39,6 +42,7 @@ interface SocialPost {
 }
 
 export const SocialMedia: React.FC<SocialMediaProps> = ({ onClose }) => {
+  const { t } = useLanguage();
   const [posts, setPosts] = useState<SocialPost[]>([
     {
       id: 'p1',
@@ -84,7 +88,7 @@ export const SocialMedia: React.FC<SocialMediaProps> = ({ onClose }) => {
     }
   ]);
 
-  const [activeCategory, setActiveCategory] = useState<string>('Tous');
+  const [activeCategory, setActiveCategory] = useState<string>(ALL_CATEGORY);
   const [newPostTitle, setNewPostTitle] = useState('');
   const [newPostText, setNewPostText] = useState('');
   const [expandedPosts, setExpandedPosts] = useState<Record<string, boolean>>({});
@@ -119,11 +123,11 @@ export const SocialMedia: React.FC<SocialMediaProps> = ({ onClose }) => {
     if (!newPostText.trim()) return;
     const newP: SocialPost = {
       id: `p-${Date.now()}`,
-      author: 'Vous (Voyageur)',
+      author: t('gazetteYou'),
       handle: '@traveler_villon',
       avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
-      time: 'à l\'instant',
-      title: newPostTitle.trim() || 'Nouvelle Annonce au Parchemin',
+      time: t('gazetteJustNow'),
+      title: newPostTitle.trim() || t('gazetteNewPost'),
       content: newPostText.trim(),
       likes: 1,
       comments: 0,
@@ -137,7 +141,7 @@ export const SocialMedia: React.FC<SocialMediaProps> = ({ onClose }) => {
     setActiveIndex(0);
   };
 
-  const filteredPosts = activeCategory === 'Tous' ? posts : posts.filter((p) => p.category === activeCategory);
+  const filteredPosts = activeCategory === ALL_CATEGORY ? posts : posts.filter((p) => p.category === activeCategory);
 
   const scrollToPost = (index: number) => {
     if (index >= 0 && index < filteredPosts.length) {
@@ -195,39 +199,40 @@ export const SocialMedia: React.FC<SocialMediaProps> = ({ onClose }) => {
               <div className="social-header-brand">
                 <div className="scroll-icon-badge"><Scroll size={22} /></div>
                 <div>
-                  <div className="scroll-pretitle">Chronique & Écrits Communaux • Anno 1784</div>
-                  <h2 className="scroll-title">La Gazette de Villon<CheckCircle2 size={16} className="verified-crest" /></h2>
-                  <p className="scroll-subtitle">Le Fil Social officiel du Village de Villon</p>
+                  <div className="scroll-pretitle">{t('gazettePreTitle')}</div>
+                  <h2 className="scroll-title">{t('gazetteTitle')}<CheckCircle2 size={16} className="verified-crest" /></h2>
+                  <p className="scroll-subtitle">{t('gazetteSubtitle')}</p>
                 </div>
               </div>
-              <button className="scroll-close-btn" onClick={handleClose} title="Enrouler le parchemin"><X size={18} /></button>
+              <button className="scroll-close-btn" onClick={handleClose} title={t('gazetteClose')}><X size={18} /></button>
             </div>
 
             <div className="social-category-bar">
-              <div className="category-label"><Filter size={13} /><span>Rubriques :</span></div>
-              {['Tous', 'Boulangerie', 'Rivière', 'Vignoble'].map((cat) => (
+              <div className="category-label"><Filter size={13} /><span>{t('gazetteCategories')}</span></div>
+              <button type="button" className={`category-pill ${activeCategory === ALL_CATEGORY ? 'active' : ''}`} onClick={() => { setActiveCategory(ALL_CATEGORY); setActiveIndex(0); }}>{t('gazetteAll')}</button>
+              {['Boulangerie', 'Rivière', 'Vignoble'].map((cat) => (
                 <button key={cat} type="button" className={`category-pill ${activeCategory === cat ? 'active' : ''}`} onClick={() => { setActiveCategory(cat); setActiveIndex(0); }}>{cat}</button>
               ))}
             </div>
 
             <form onSubmit={handleCreatePost} className="create-post-card parchment-post-card">
               <div className="create-post-top">
-                <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80" alt="Vous" className="create-post-avatar parchment-avatar" style={{ width: '42px', height: '42px', minWidth: '42px', minHeight: '42px', objectFit: 'cover', borderRadius: '50%' }} />
+                <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80" alt={t('gazetteYou')} className="create-post-avatar parchment-avatar" style={{ width: '42px', height: '42px', minWidth: '42px', minHeight: '42px', objectFit: 'cover', borderRadius: '50%' }} />
                 <div className="parchment-input-wrapper">
-                  <input type="text" className="create-post-title-input parchment-input" placeholder="Titre de votre annonce..." value={newPostTitle} onChange={(e) => setNewPostTitle(e.target.value)} />
-                  <textarea className="create-post-input parchment-input" rows={2} placeholder="Rédigez une missive pour la communauté..." value={newPostText} onChange={(e) => setNewPostText(e.target.value)} />
+                  <input type="text" className="create-post-title-input parchment-input" placeholder={t('gazettePostTitle')} value={newPostTitle} onChange={(e) => setNewPostTitle(e.target.value)} />
+                  <textarea className="create-post-input parchment-input" rows={2} placeholder={t('gazettePostContent')} value={newPostText} onChange={(e) => setNewPostText(e.target.value)} />
                 </div>
               </div>
               <div className="create-post-bottom parchment-post-bottom">
                 <span className="create-post-tag parchment-tag"><Sparkles size={13} />#VillonWood</span>
-                <button type="submit" className="post-submit-btn parchment-submit-btn" disabled={!newPostText.trim()}><Send size={13} /><span>Publier</span></button>
+                <button type="submit" className="post-submit-btn parchment-submit-btn" disabled={!newPostText.trim()}><Send size={13} /><span>{t('gazettePublish')}</span></button>
               </div>
             </form>
 
             <div className="gazette-nav-bar">
-              <button type="button" className="gazette-nav-btn" disabled={activeIndex === 0} onClick={() => scrollToPost(activeIndex - 1)}><ChevronLeft size={16} /><span>Précédent</span></button>
-              <span className="gazette-nav-counter">Annonce {filteredPosts.length > 0 ? activeIndex + 1 : 0} sur {filteredPosts.length}</span>
-              <button type="button" className="gazette-nav-btn" disabled={activeIndex >= filteredPosts.length - 1} onClick={() => scrollToPost(activeIndex + 1)}><span>Suivant</span><ChevronRight size={16} /></button>
+              <button type="button" className="gazette-nav-btn" disabled={activeIndex === 0} onClick={() => scrollToPost(activeIndex - 1)}><ChevronLeft size={16} /><span>{t('gazettePrev')}</span></button>
+              <span className="gazette-nav-counter">{t('gazetteAnnouncement')} {filteredPosts.length > 0 ? activeIndex + 1 : 0} {t('gazetteOf')} {filteredPosts.length}</span>
+              <button type="button" className="gazette-nav-btn" disabled={activeIndex >= filteredPosts.length - 1} onClick={() => scrollToPost(activeIndex + 1)}><span>{t('gazetteNext')}</span><ChevronRight size={16} /></button>
             </div>
 
             <div ref={feedListRef} onScroll={handleScroll} className="social-feed-list parchment-feed-list">
@@ -253,18 +258,18 @@ export const SocialMedia: React.FC<SocialMediaProps> = ({ onClose }) => {
                     )}
                     <div className={`post-content parchment-content ${isExpanded ? 'expanded' : 'truncated'}`}>{post.content}</div>
                     <button type="button" className="see-more-btn parchment-see-more" onClick={() => toggleExpand(post.id)}>
-                      {isExpanded ? (<><span>Voir moins</span><ChevronUp size={14} /></>) : (<><span>Voir la suite</span><ChevronDown size={14} /></>)}
+                      {isExpanded ? (<><span>{t('gazetteShowLess')}</span><ChevronUp size={14} /></>) : (<><span>{t('gazetteShowMore')}</span><ChevronDown size={14} /></>)}
                     </button>
                     <div className="post-actions-bar parchment-actions-bar">
-                      <button type="button" className={`action-btn parchment-action-btn ${post.isLiked ? 'liked' : ''}`} onClick={() => handleLike(post.id)}><Heart size={16} fill={post.isLiked ? 'currentColor' : 'none'} /><span>{post.likes} Sceaux</span></button>
-                      <button type="button" className="action-btn parchment-action-btn"><MessageSquare size={16} /><span>{post.comments} Missives</span></button>
-                      <button type="button" className="action-btn parchment-action-btn"><Share2 size={16} /><span>Transmettre</span></button>
-                      <button type="button" className={`action-btn parchment-action-btn ${post.isBookmarked ? 'bookmarked' : ''}`} onClick={() => handleBookmark(post.id)} title="Enregistrer"><Bookmark size={16} fill={post.isBookmarked ? 'currentColor' : 'none'} /></button>
+                      <button type="button" className={`action-btn parchment-action-btn ${post.isLiked ? 'liked' : ''}`} onClick={() => handleLike(post.id)}><Heart size={16} fill={post.isLiked ? 'currentColor' : 'none'} /><span>{post.likes} {t('gazetteSeals')}</span></button>
+                      <button type="button" className="action-btn parchment-action-btn"><MessageSquare size={16} /><span>{post.comments} {t('gazetteMissives')}</span></button>
+                      <button type="button" className="action-btn parchment-action-btn"><Share2 size={16} /><span>{t('gazetteShare')}</span></button>
+                      <button type="button" className={`action-btn parchment-action-btn ${post.isBookmarked ? 'bookmarked' : ''}`} onClick={() => handleBookmark(post.id)} title={t('gazetteSave')}><Bookmark size={16} fill={post.isBookmarked ? 'currentColor' : 'none'} /></button>
                     </div>
                   </div>
                 );
               })}
-              {filteredPosts.length === 0 && (<div className="empty-feed-notice"><p>Aucune annonce trouvée dans cette rubrique.</p></div>)}
+              {filteredPosts.length === 0 && (<div className="empty-feed-notice"><p>{t('gazetteEmpty')}</p></div>)}
             </div>
           </div>
           <div className="scroll-paper-curl-bottom" />

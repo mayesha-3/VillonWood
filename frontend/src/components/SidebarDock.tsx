@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
-import { Newspaper, Camera, Music, Settings, Shield, Volume2 } from 'lucide-react';
+import React from 'react';
+import { Newspaper, Camera, Music, Settings, Shield, Volume2, LayoutDashboard } from 'lucide-react';
 import type { ActiveOverlay } from '../types/village';
+import { useAdmin } from '../contexts/AdminContext';
+import { useLanguage } from '../contexts/LanguageContext';
+import { useMusic } from '../contexts/MusicContext';
 
 interface SidebarDockProps {
   activeOverlay: ActiveOverlay;
@@ -15,11 +18,17 @@ export const SidebarDock: React.FC<SidebarDockProps> = ({
   showHUD,
   onToggleHUD
 }) => {
-  const [isPlayingMusic, setIsPlayingMusic] = useState(false);
+  const { isPlaying: isPlayingMusic } = useMusic();
+  const { currentUserRole } = useAdmin();
+  const { t } = useLanguage();
 
   const toggleMusic = () => {
-    setIsPlayingMusic((prev) => !prev);
-    onOpenOverlay(activeOverlay === 'music' ? null : 'music');
+    if (activeOverlay === 'music') {
+      onOpenOverlay(null);
+      return;
+    }
+
+    onOpenOverlay('music');
   };
 
   return (
@@ -29,10 +38,10 @@ export const SidebarDock: React.FC<SidebarDockProps> = ({
         type="button"
         className={`sidebar-round-btn ${activeOverlay === 'media' ? 'active' : ''}`}
         onClick={() => onOpenOverlay('media')}
-        title="Villon Media (Gazette)"
+        title={t('sidebarMedia')}
       >
         <Newspaper size={20} />
-        <span className="sidebar-tooltip">Villon Media</span>
+        <span className="sidebar-tooltip">{t('sidebarMedia')}</span>
       </button>
 
       {/* 2. Camera / Photo Booth */}
@@ -40,10 +49,10 @@ export const SidebarDock: React.FC<SidebarDockProps> = ({
         type="button"
         className={`sidebar-round-btn ${activeOverlay === 'camera' ? 'active' : ''}`}
         onClick={() => onOpenOverlay('camera')}
-        title="Mode Photo / Caméra"
+        title={t('sidebarCamera')}
       >
         <Camera size={20} />
-        <span className="sidebar-tooltip">Photo Booth</span>
+        <span className="sidebar-tooltip">{t('sidebarCamera')}</span>
       </button>
 
       {/* 3. Music / Village Ambience */}
@@ -51,10 +60,10 @@ export const SidebarDock: React.FC<SidebarDockProps> = ({
         type="button"
         className={`sidebar-round-btn ${activeOverlay === 'music' || isPlayingMusic ? 'active' : ''}`}
         onClick={toggleMusic}
-        title="Ambiance & Musique du village"
+        title={t('sidebarMusic')}
       >
         {isPlayingMusic ? <Volume2 size={20} /> : <Music size={20} />}
-        <span className="sidebar-tooltip">Musique</span>
+        <span className="sidebar-tooltip">{t('sidebarMusic')}</span>
       </button>
 
       {/* 4. Settings */}
@@ -62,21 +71,34 @@ export const SidebarDock: React.FC<SidebarDockProps> = ({
         type="button"
         className={`sidebar-round-btn ${activeOverlay === 'settings' ? 'active' : ''}`}
         onClick={() => onOpenOverlay('settings')}
-        title="Paramètres"
+        title={t('sidebarSettings')}
       >
         <Settings size={20} />
-        <span className="sidebar-tooltip">Paramètres</span>
+        <span className="sidebar-tooltip">{t('sidebarSettings')}</span>
       </button>
 
-      {/* 5. Stat Bar ON/OFF Toggle */}
+      {/* 5. Admin Panel Button (if admin) */}
+      {currentUserRole === 'admin' && (
+        <button
+          type="button"
+          className={`sidebar-round-btn admin-badge-btn ${activeOverlay === 'admin' ? 'active' : ''}`}
+          onClick={() => onOpenOverlay('admin')}
+          title={t('sidebarAdmin')}
+        >
+          <LayoutDashboard size={20} />
+          <span className="sidebar-tooltip">{t('sidebarAdmin')}</span>
+        </button>
+      )}
+
+      {/* 6. Stat Bar ON/OFF Toggle */}
       <button
         type="button"
         className={`sidebar-round-btn ${showHUD ? 'active-hud' : ''}`}
         onClick={onToggleHUD}
-        title={showHUD ? "Masquer le Statut HUD" : "Afficher le Statut HUD"}
+        title={showHUD ? t('sidebarHudHide') : t('sidebarHudShow')}
       >
         <Shield size={20} />
-        <span className="sidebar-tooltip">{showHUD ? "Masquer Statut" : "Statut HUD"}</span>
+        <span className="sidebar-tooltip">{showHUD ? t('sidebarHudHide') : t('sidebarHudShow')}</span>
         <span className={`sidebar-dot-indicator ${showHUD ? 'on' : 'off'}`} />
       </button>
     </div>
