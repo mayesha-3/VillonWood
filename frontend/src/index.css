@@ -1362,7 +1362,17 @@ body, html {
 }
 .avatar-frame { width: 42px; height: 42px; flex-shrink: 0; }
 
-.parchment-feed-list { padding: 16px 24px 22px; scroll-snap-type: y mandatory; overflow-y: auto; max-height: 480px; display: flex; flex-direction: column; gap: 18px; scrollbar-width: thin; scrollbar-color: #a4763c transparent; }
+.parchment-feed-list { 
+  flex: 1 1 auto !important;
+  min-height: 0 !important; 
+  overflow-y: auto !important; 
+  padding: 16px 24px 22px; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 18px; 
+  scrollbar-width: thin; 
+  scrollbar-color: #e4763c transparent; 
+}
 .parchment-feed-list::-webkit-scrollbar { width: 7px; }
 .parchment-feed-list::-webkit-scrollbar-thumb { background-color: #a4763c; border-radius: 4px; }
 
@@ -1390,11 +1400,21 @@ body, html {
 .parchment-action-btn.bookmarked { color: #c88a2b; }
 .empty-feed-notice { text-align: center; padding: 30px; color: #7d481a; font-style: italic; font-size: 14px; }
 
-/* Scroll overflow overrides */
-.scroll-unfurl-container { flex: 1 1 auto !important; min-height: 0 !important; overflow-y: auto !important; overflow-x: hidden !important; -webkit-overflow-scrolling: touch; }
-.scroll-parchment-body { height: auto !important; min-height: max-content !important; overflow: visible !important; }
-.parchment-feed-list { height: auto !important; overflow: visible !important; }
 
+/* Scroll overflow overrides */
+.scroll-unfurl-container { 
+  display: flex !important;
+  flex-direction: column !important;
+  max-height: 85vh !important;
+  overflow: hidden !important; 
+}
+
+.scroll-parchment-body { 
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  overflow: hidden !important; 
+}
 .social-header {
   padding: 16px 22px;
   background: rgba(245, 238, 228, 0.9);
@@ -2462,3 +2482,56 @@ body, html {
   animation: authSpin 0.6s linear infinite;
 }
 @keyframes authSpin { to { transform: rotate(360deg); } }
+
+/* Keep the parchment background stationary */
+.scroll-unfurl-container {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.scroll-parchment-body {
+  position: relative;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  height: auto !important;
+
+  /* Background stays in place */
+  background-attachment: local;
+
+  /* Only the content area scrolls */
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+.parchment-feed-list {
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+
+/* Social page: keep the outer layout fixed */
+.social-page {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Header: everything above the blue line */
+.social-header {
+  flex: 0 0 auto;
+}
+
+/* Feed: only posts below the blue line scroll */
+.social-feed {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
