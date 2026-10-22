@@ -1,5 +1,5 @@
 import React from 'react';
-import { Newspaper, Camera, Music, Settings, Shield, Volume2, LayoutDashboard } from 'lucide-react';
+import { Newspaper, Camera, Music, Settings, Shield, Volume2, LayoutDashboard, BookOpen } from 'lucide-react';
 import type { ActiveOverlay } from '../types/village';
 import { useAdmin } from '../contexts/AdminContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -77,7 +77,20 @@ export const SidebarDock: React.FC<SidebarDockProps> = ({
         <span className="sidebar-tooltip">{t('sidebarSettings')}</span>
       </button>
 
-      {/* 5. Admin Panel Button (if admin) */}
+      {/* 5. Teacher Dashboard Button (if teacher or admin) */}
+      {(currentUserRole === 'teacher' || currentUserRole === 'admin') && (
+        <button
+          type="button"
+          className={`sidebar-round-btn ${activeOverlay === 'teacher' ? 'active' : ''}`}
+          onClick={() => onOpenOverlay('teacher' as ActiveOverlay)}
+          title={t('sidebarTeacher')}
+        >
+          <BookOpen size={20} />
+          <span className="sidebar-tooltip">{t('sidebarTeacher')}</span>
+        </button>
+      )}
+
+      {/* 6. Admin Panel Button (if admin) */}
       {currentUserRole === 'admin' && (
         <button
           type="button"

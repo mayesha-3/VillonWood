@@ -8,9 +8,12 @@ import CameraOverlay from './components/CameraOverlay';
 import MusicPlayerOverlay from './components/MusicPlayerOverlay';
 import SettingsOverlay from './components/SettingsOverlay';
 import AdminDashboard from './components/AdminDashboard';
+import TeacherDashboard from './components/TeacherDashboard';
 import RestrictedBanner from './components/RestrictedBanner';
 import Chatbot from './chatbot';
 import GroupChat from './groupChats';
+import WordsOfTheDay from './components/WordsOfTheDay';
+import QuizModal from './components/QuizModal';
 import AuthModal from './components/AuthModal';
 import { useAuth } from './contexts/AuthContext';
 import { useAdmin } from './contexts/AdminContext';
@@ -28,6 +31,7 @@ const VillageView: React.FC = () => {
   const [isAIOpen, setIsAIOpen] = useState<boolean>(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showHUD, setShowHUD] = useState<boolean>(false);
+  const [showQuiz, setShowQuiz] = useState(false);
 
   const handleSelectLocation = (location: VillagerProfession) => {
     if (!user) {
@@ -46,6 +50,8 @@ const VillageView: React.FC = () => {
       setIsAIOpen((prev) => !prev);
     } else if (overlay === 'admin') {
       navigate('/mod');
+    } else if (overlay === 'teacher') {
+      navigate('/teacher');
     } else {
       setActiveOverlay(overlay);
     }
@@ -149,6 +155,17 @@ const VillageView: React.FC = () => {
       {showAuthModal && (
         <AuthModal onClose={() => setShowAuthModal(false)} />
       )}
+
+      {/* Words of the Day floating card (students see this on the map) */}
+      {user && <WordsOfTheDay />}
+
+      {/* Weekly Quiz Modal */}
+      {user && (
+        <QuizModal
+          isOpen={showQuiz}
+          onClose={() => setShowQuiz(false)}
+        />
+      )}
     </div>
   );
 };
@@ -158,11 +175,17 @@ const ModPage: React.FC = () => {
   return <AdminDashboard onBackToMap={() => navigate('/')} />;
 };
 
+const TeacherPage: React.FC = () => {
+  const navigate = useNavigate();
+  return <TeacherDashboard onBackToMap={() => navigate('/')} />;
+};
+
 export const App: React.FC = () => {
   return (
     <Routes>
       <Route path="/" element={<VillageView />} />
       <Route path="/mod" element={<ModPage />} />
+      <Route path="/teacher" element={<TeacherPage />} />
     </Routes>
   );
 };

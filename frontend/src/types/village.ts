@@ -34,5 +34,5 @@ export interface VillagerProfession {
   sampleMessages: ChatMessage[];
 }
 
-export type ActiveOverlay = 'media' | 'ai' | 'chat' | 'camera' | 'music' | 'settings' | 'admin' | null;
+export type ActiveOverlay = 'media' | 'ai' | 'chat' | 'camera' | 'music' | 'settings' | 'admin' | 'teacher' | 'quiz' | null;
 

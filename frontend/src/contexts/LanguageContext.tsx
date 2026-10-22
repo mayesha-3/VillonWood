@@ -131,6 +131,16 @@ export const translations: Translations = {
 
   // Auth
   loginLogout: { fr: 'Déconnexion', en: 'Log Out' },
+
+  // Teacher & Learning
+  teacherDashboard: { fr: 'Tableau de bord Enseignant', en: 'Teacher Dashboard' },
+  sidebarTeacher: { fr: 'Espace Enseignant', en: 'Teacher Dashboard' },
+  studentActivity: { fr: 'Activité des Apprenants', en: 'Student Activity' },
+  wordsOfTheDayTitle: { fr: 'Mots du Jour', en: 'Words of the Day' },
+  weeklyQuizTitle: { fr: 'Quiz Hebdomadaire', en: 'Weekly Quiz' },
+  publishWords: { fr: 'Publier les mots', en: 'Publish Words' },
+  publishQuiz: { fr: 'Publier le quiz', en: 'Publish Quiz' },
+  backToVillage: { fr: 'Retour au village', en: 'Back to Village' },
 };
 
 interface LanguageContextType {
