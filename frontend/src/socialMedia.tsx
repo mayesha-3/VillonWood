@@ -7,9 +7,6 @@ import {
   BriefcaseBusiness, CalendarDays, Languages, ScrollText
 } from 'lucide-react';
 import mapImage from './assets/map.png';
-import { useLanguage } from './contexts/LanguageContext';
-
-const ALL_CATEGORY = 'all';
 
 interface SocialMediaProps { onClose: () => void }
 interface Professional {
@@ -150,17 +147,6 @@ const getVillonDateKey = (dateKey: string) => {
 };
 
 
-const getDhakaDayNumber = () => {
-  const dateKey = getDhakaDateKey();
-  const [year, month, day] = dateKey.split('-').map(Number);
-  return Math.floor(Date.UTC(year, month - 1, day) / 86400000);
-};
-const initialComments: Record<string, SocialComment[]> = {
-  bertrand:[{id:'c1',author:'Colette',text:'Quelle belle récolte ! Les couleurs des champs sont magnifiques. 🌾',avatar:professionals[10].avatar},{id:'c2',author:'Maître Pierre de Villon',text:'Nous prendrons volontiers des légumes frais pour l’auberge !',avatar:professionals[19].avatar}],
-  jacques:[{id:'c3',author:'Gaston',text:'Le soleil a vraiment aidé les vignes cette semaine !',avatar:professionals[9].avatar},{id:'c4',author:'Aveline',text:'J’aimerais beaucoup visiter le domaine. 🍇',avatar:professionals[18].avatar}],
-  jeanluc:[{id:'c5',author:'Madame Simone',text:'Une brioche chaude avec mon fromage frais : un délice !',avatar:professionals[8].avatar},{id:'c6',author:'Maître Bertrand',text:'Je passerai prendre du pain après la ferme.',avatar:professionals[0].avatar}],
-  capitaine:[{id:'c7',author:'Guillaume',text:'Le troupeau et moi vous saluons depuis les collines !',avatar:professionals[2].avatar},{id:'c8',author:'Maître Pierre de Villon',text:'Gardez-nous quelques belles truites pour le dîner !',avatar:professionals[19].avatar}],
-};
 const englishTranslations: Record<string, { title: string; content: string }> = {
   bertrand: { title: 'The morning harvest has arrived!', content: 'The fields are golden and the wheat harvest begins at dawn. Come discover our seasonal vegetables and fresh hay at the farm. May this be a generous day for the whole village!' },
   jacques: { title: 'At the heart of the Clos vineyards', content: 'The grapes have taken on a beautiful colour in the sunshine. A guided walk through the vineyard will take place this afternoon, and I will share the secrets of our land.' },
@@ -400,23 +386,6 @@ const professionalWork: Record<
   },
 };
 
-
-const defaultComments = (p: Professional): SocialComment[] => [
-  {
-    id: `${p.id}-comment-a`,
-    author: 'Colette',
-    text: 'Quel beau travail ! Merci de partager les nouvelles du village. ✨',
-    englishText: 'What beautiful work! Thank you for sharing the village news. ✨',
-    avatar: professionals[10].avatar,
-  },
-  {
-    id: `${p.id}-comment-b`,
-    author: 'Maître Pierre de Villon',
-    text: 'Félicitations ! Nous sommes heureux de vous compter parmi nous.',
-    englishText: 'Congratulations! We are happy to have you with us.',
-    avatar: professionals[19].avatar,
-  },
-];
 
 const makeProfessionalComments = (
   professional: Professional,
