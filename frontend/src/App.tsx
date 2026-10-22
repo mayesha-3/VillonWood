@@ -69,6 +69,7 @@ const VillageView: React.FC = () => {
     <div className="villon-app-layout">
       {isCurrentUserRestricted && <RestrictedBanner />}
 
+      {/* Top-Left Tactical Videogame HUD */}
       {showHUD && (
         <GameHUDTopLeft 
           totalVillagers={VILLAGERS_DATA.length} 
@@ -76,6 +77,7 @@ const VillageView: React.FC = () => {
         />
       )}
 
+      {/* Main Interactive Map Viewport */}
       <main className="main-content-viewport">
         <MapViewer
           villagers={VILLAGERS_DATA}
@@ -83,6 +85,7 @@ const VillageView: React.FC = () => {
         />
       </main>
 
+      {/* Sidebar Dock */}
       <SidebarDock
         activeOverlay={activeOverlay}
         onOpenOverlay={handleOpenOverlay}
@@ -90,6 +93,7 @@ const VillageView: React.FC = () => {
         onToggleHUD={() => setShowHUD((prev) => !prev)}
       />
 
+      {/* Gated: Villon Media */}
       {user && activeOverlay === 'media' && (
         <SocialMedia onClose={() => setActiveOverlay(null)} />
       )}
@@ -108,6 +112,7 @@ const VillageView: React.FC = () => {
         />
       )}
 
+      {/* Gated: Floating AI Chatbot */}
       {user && (
         <Chatbot
           isOpen={isAIOpen}
@@ -115,6 +120,7 @@ const VillageView: React.FC = () => {
         />
       )}
 
+      {/* Gated: Floating AI Trigger Fab */}
       {user && !isAIOpen && (
         <button
           type="button"
@@ -130,6 +136,7 @@ const VillageView: React.FC = () => {
         </button>
       )}
 
+      {/* Non-logged-in FAB that prompts auth */}
       {!user && (
         <button
           type="button"
@@ -145,6 +152,7 @@ const VillageView: React.FC = () => {
         </button>
       )}
 
+      {/* Gated: Group Chat */}
       {user && selectedLocation && (
         <GroupChat
           location={selectedLocation}
@@ -152,6 +160,7 @@ const VillageView: React.FC = () => {
         />
       )}
 
+      {/* Auth Modal Popup */}
       {showAuthModal && (
         <AuthModal onClose={() => setShowAuthModal(false)} />
       )}
