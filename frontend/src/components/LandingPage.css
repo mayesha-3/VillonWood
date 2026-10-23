@@ -1,0 +1,1140 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   VILLONWOOD — LANDING & AUTHENTICATION EXPERIENCE
+   Color Palette: Deep Forest Green, Rich Warm Cream, Antique Gold, Earth Tones
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --vw-forest-darkest: #07100b;
+  --vw-forest-dark: #0d1e16;
+  --vw-forest-mid: #153225;
+  --vw-forest-emerald: #1c4935;
+  --vw-forest-accent: #2e6b50;
+  
+  --vw-cream-light: #faf6f0;
+  --vw-cream-parchment: #f2e9dc;
+  --vw-cream-muted: #c9bcab;
+  --vw-cream-faint: rgba(250, 246, 240, 0.08);
+
+  --vw-gold-primary: #d4af37;
+  --vw-gold-warm: #c88a2b;
+  --vw-gold-amber: #e59838;
+  --vw-gold-glow: rgba(212, 175, 55, 0.22);
+  --vw-gold-border: rgba(212, 175, 55, 0.32);
+
+  --vw-card-bg: rgba(13, 28, 20, 0.78);
+  --vw-card-border: rgba(212, 175, 55, 0.24);
+  --vw-shadow-deep: 0 24px 64px rgba(0, 0, 0, 0.65);
+}
+
+/* Page Scroll Container */
+.vw-landing-container {
+  width: 100vw;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: var(--vw-forest-darkest);
+  color: var(--vw-cream-light);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  position: relative;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Background Atmospheric Canvas */
+.vw-bg-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: 
+    radial-gradient(ellipse 90% 60% at 50% -20%, rgba(38, 92, 67, 0.45) 0%, transparent 70%),
+    radial-gradient(circle 45vw at 90% 30%, rgba(200, 138, 43, 0.12) 0%, transparent 60%),
+    radial-gradient(circle 50vw at 10% 85%, rgba(21, 50, 37, 0.5) 0%, transparent 70%),
+    linear-gradient(180deg, #07100b 0%, #0d1e16 50%, #08120c 100%);
+}
+
+.vw-bg-ambient-texture {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(212, 175, 55, 0.08) 1px, transparent 1px);
+  background-size: 36px 36px;
+  opacity: 0.35;
+}
+
+/* Content Wrapper */
+.vw-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   HEADER / NAVIGATION
+   ═══════════════════════════════════════════════════════════════════════════ */
+.vw-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  background: rgba(7, 16, 11, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+  transition: all 0.3s ease;
+}
+
+.vw-header-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 18px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.vw-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.vw-brand-icon-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #1f4836, #122c20);
+  border: 1px solid var(--vw-gold-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--vw-gold-primary);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4), 0 0 16px var(--vw-gold-glow);
+  font-size: 20px;
+  transition: transform 0.25s ease;
+}
+
+.vw-brand:hover .vw-brand-icon-box {
+  transform: rotate(6deg) scale(1.05);
+}
+
+.vw-brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.vw-brand-name {
+  font-family: 'Cinzel', serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--vw-cream-light);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.vw-brand-tag {
+  font-size: 10.5px;
+  color: var(--vw-gold-amber);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.vw-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.vw-nav-link {
+  color: var(--vw-cream-muted);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+  cursor: pointer;
+}
+
+.vw-nav-link:hover {
+  color: var(--vw-gold-primary);
+}
+
+.vw-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.vw-btn-ghost {
+  background: transparent;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  color: var(--vw-cream-parchment);
+  padding: 8px 18px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.vw-btn-ghost:hover {
+  background: rgba(212, 175, 55, 0.12);
+  border-color: var(--vw-gold-primary);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.vw-btn-primary-sm {
+  background: linear-gradient(135deg, #c88a2b, #a56b1a);
+  border: 1px solid rgba(255, 230, 160, 0.4);
+  color: #ffffff;
+  padding: 9px 20px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(200, 138, 43, 0.35);
+  font-family: inherit;
+}
+
+.vw-btn-primary-sm:hover {
+  background: linear-gradient(135deg, #d99a38, #b97a22);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(200, 138, 43, 0.5);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   HERO SECTION (SPLIT: VALUE PROP LEFT, AUTH CARD RIGHT)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.vw-hero-section {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 64px 32px 80px;
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 56px;
+  align-items: center;
+  position: relative;
+}
+
+/* Hero Left Column */
+.vw-hero-left {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.vw-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  background: rgba(28, 73, 53, 0.45);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  color: var(--vw-gold-amber);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  width: fit-content;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.vw-hero-badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--vw-gold-primary);
+  box-shadow: 0 0 8px var(--vw-gold-primary);
+  animation: vwPulse 2s infinite ease-in-out;
+}
+
+@keyframes vwPulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.3); }
+}
+
+.vw-hero-title {
+  font-family: 'Cinzel', serif;
+  font-size: 52px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.5px;
+  color: var(--vw-cream-light);
+  margin: 0;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+}
+
+.vw-hero-title-accent {
+  background: linear-gradient(135deg, #faeed4 20%, #d4af37 60%, #e59838 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: block;
+}
+
+.vw-hero-description {
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--vw-cream-parchment);
+  opacity: 0.9;
+  max-width: 540px;
+  margin: 0;
+}
+
+.vw-hero-ctas {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.vw-btn-hero-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #c88a2b 0%, #9e6315 100%);
+  border: 1px solid rgba(255, 230, 160, 0.5);
+  color: #ffffff;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 8px 24px rgba(200, 138, 43, 0.35);
+  font-family: inherit;
+}
+
+.vw-btn-hero-primary:hover {
+  background: linear-gradient(135deg, #dc9933 0%, #b4721a 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(200, 138, 43, 0.5);
+}
+
+.vw-btn-hero-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(21, 50, 37, 0.6);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  color: var(--vw-cream-parchment);
+  padding: 14px 26px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-family: inherit;
+  backdrop-filter: blur(8px);
+}
+
+.vw-btn-hero-secondary:hover {
+  background: rgba(28, 73, 53, 0.8);
+  border-color: var(--vw-gold-primary);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* Feature Highlights Grid in Hero */
+.vw-hero-highlights {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 16px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(212, 175, 55, 0.16);
+}
+
+.vw-hero-highlight-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.vw-highlight-num {
+  font-family: 'Cinzel', serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--vw-gold-primary);
+}
+
+.vw-highlight-label {
+  font-size: 12px;
+  color: var(--vw-cream-muted);
+  line-height: 1.3;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   AUTHENTICATION CARD (HERO RIGHT)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.vw-auth-card-wrapper {
+  position: relative;
+}
+
+.vw-auth-card-glow {
+  position: absolute;
+  inset: -1px;
+  border-radius: 24px;
+  background: linear-gradient(145deg, rgba(212, 175, 55, 0.35), transparent 60%, rgba(46, 107, 80, 0.4));
+  filter: blur(14px);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.vw-auth-card {
+  position: relative;
+  background: rgba(13, 26, 19, 0.9);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border: 1px solid rgba(212, 175, 55, 0.32);
+  border-radius: 22px;
+  padding: 32px 28px 28px;
+  box-shadow: 
+    0 24px 60px rgba(0, 0, 0, 0.6),
+    0 4px 16px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 245, 220, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Mode Switch Tabs */
+.vw-auth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: rgba(6, 14, 10, 0.7);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 12px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.vw-auth-tab {
+  background: transparent;
+  border: none;
+  color: var(--vw-cream-muted);
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 9px 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.vw-auth-tab.active {
+  background: linear-gradient(135deg, rgba(38, 92, 67, 0.9), rgba(21, 50, 37, 0.95));
+  color: #fff;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.vw-auth-header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.vw-auth-heading {
+  font-family: 'Cinzel', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--vw-cream-light);
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.vw-auth-subtext {
+  font-size: 13px;
+  color: var(--vw-cream-muted);
+  margin: 0;
+}
+
+/* Error Banner */
+.vw-auth-error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(180, 35, 35, 0.22);
+  border: 1px solid rgba(248, 113, 113, 0.4);
+  padding: 10px 14px;
+  border-radius: 10px;
+  color: #fca5a5;
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.4;
+  animation: vwShake 0.35s ease;
+}
+
+@keyframes vwShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+/* Form */
+.vw-auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.vw-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vw-input-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--vw-cream-parchment);
+  letter-spacing: 0.3px;
+}
+
+.vw-input-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: rgba(7, 16, 11, 0.75);
+  border: 1px solid rgba(212, 175, 55, 0.24);
+  border-radius: 11px;
+  padding: 0 14px;
+  transition: all 0.2s ease;
+}
+
+.vw-input-field:focus-within {
+  border-color: var(--vw-gold-primary);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+  background: rgba(10, 22, 15, 0.9);
+}
+
+.vw-input-icon {
+  color: rgba(212, 175, 55, 0.55);
+  flex-shrink: 0;
+}
+
+.vw-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 13px 10px;
+  color: #ffffff;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+}
+
+.vw-input::placeholder {
+  color: rgba(201, 188, 171, 0.45);
+}
+
+.vw-pw-toggle {
+  background: none;
+  border: none;
+  color: rgba(201, 188, 171, 0.5);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.vw-pw-toggle:hover {
+  color: var(--vw-gold-primary);
+}
+
+.vw-submit-btn {
+  width: 100%;
+  padding: 13px;
+  border: none;
+  border-radius: 11px;
+  background: linear-gradient(135deg, #c88a2b, #a56b1a);
+  color: #ffffff;
+  font-size: 14.5px;
+  font-weight: 700;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 16px rgba(200, 138, 43, 0.35);
+  margin-top: 4px;
+}
+
+.vw-submit-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #dc9933, #ba7a22);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 22px rgba(200, 138, 43, 0.5);
+}
+
+.vw-submit-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Divider */
+.vw-auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 2px 0;
+}
+
+.vw-divider-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(212, 175, 55, 0.16);
+}
+
+.vw-divider-text {
+  font-size: 11px;
+  color: var(--vw-cream-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 600;
+}
+
+/* Google OAuth */
+.vw-google-btn {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 11px;
+  border: 1px solid rgba(212, 175, 55, 0.24);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--vw-cream-parchment);
+  font-size: 13.5px;
+  font-weight: 600;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.vw-google-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--vw-gold-primary);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.vw-google-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Toggle mode link */
+.vw-auth-toggle-hint {
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--vw-cream-muted);
+  margin: 0;
+}
+
+.vw-auth-switch-link {
+  background: none;
+  border: none;
+  color: var(--vw-gold-primary);
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 12.5px;
+  font-family: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 0 4px;
+  transition: color 0.2s ease;
+}
+
+.vw-auth-switch-link:hover {
+  color: var(--vw-gold-amber);
+}
+
+/* Auth Spinner */
+.vw-spinner {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  animation: vwSpin 0.7s linear infinite;
+}
+
+@keyframes vwSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   HOW IT WORKS (3-STEP SECTION)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.vw-section {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 80px 32px;
+  position: relative;
+}
+
+.vw-section-header {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 52px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.vw-section-kicker {
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  color: var(--vw-gold-amber);
+  font-weight: 700;
+}
+
+.vw-section-title {
+  font-family: 'Cinzel', serif;
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--vw-cream-light);
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.vw-section-desc {
+  font-size: 16px;
+  color: var(--vw-cream-parchment);
+  line-height: 1.6;
+  opacity: 0.85;
+  margin: 0;
+}
+
+.vw-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  position: relative;
+}
+
+.vw-step-card {
+  background: rgba(13, 28, 20, 0.7);
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  border-radius: 18px;
+  padding: 36px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
+.vw-step-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--vw-gold-primary);
+  background: rgba(17, 36, 26, 0.85);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5), 0 0 20px rgba(212, 175, 55, 0.15);
+}
+
+.vw-step-num-badge {
+  position: absolute;
+  top: -14px;
+  left: 28px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #c88a2b, #8f5812);
+  color: #fff;
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 230, 160, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.vw-step-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: rgba(28, 73, 53, 0.5);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--vw-gold-primary);
+  margin-top: 4px;
+}
+
+.vw-step-title {
+  font-family: 'Cinzel', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--vw-cream-light);
+  margin: 0;
+}
+
+.vw-step-text {
+  font-size: 14.5px;
+  color: var(--vw-cream-muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   VILLAGE PLACES SHOWCASE (AUTHENTIC ASSETS)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.vw-showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.vw-place-card {
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  background: #0d1e16;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.vw-place-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--vw-gold-primary);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.6), 0 0 24px rgba(212, 175, 55, 0.18);
+}
+
+.vw-place-img-wrap {
+  width: 100%;
+  height: 180px;
+  position: relative;
+  overflow: hidden;
+  background: #08120c;
+}
+
+.vw-place-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.vw-place-card:hover .vw-place-img {
+  transform: scale(1.06);
+}
+
+.vw-place-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(13, 30, 22, 0.95) 100%);
+}
+
+.vw-place-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(7, 16, 11, 0.85);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--vw-gold-amber);
+  backdrop-filter: blur(8px);
+}
+
+.vw-place-content {
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.vw-place-title {
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--vw-cream-light);
+  margin: 0;
+}
+
+.vw-place-char {
+  font-size: 12px;
+  color: var(--vw-gold-primary);
+  font-weight: 600;
+}
+
+.vw-place-desc {
+  font-size: 13.5px;
+  color: var(--vw-cream-muted);
+  line-height: 1.5;
+  margin: 0;
+  flex: 1;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   THREE PILLARS (AI, LIVING MAP, COMMUNITY)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.vw-pillars-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.vw-pillar-card {
+  background: linear-gradient(160deg, rgba(16, 36, 26, 0.75) 0%, rgba(9, 20, 14, 0.85) 100%);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 18px;
+  padding: 32px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
+}
+
+.vw-pillar-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(28, 73, 53, 0.5);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--vw-gold-primary);
+}
+
+.vw-pillar-title {
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--vw-cream-light);
+  margin: 0;
+}
+
+.vw-pillar-text {
+  font-size: 13.5px;
+  color: var(--vw-cream-muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BOTTOM CTA BANNER
+   ═══════════════════════════════════════════════════════════════════════════ */
+.vw-cta-banner {
+  max-width: 1280px;
+  margin: 20px auto 80px;
+  padding: 0 32px;
+}
+
+.vw-cta-banner-inner {
+  border-radius: 24px;
+  background: linear-gradient(135deg, rgba(22, 54, 39, 0.85) 0%, rgba(13, 26, 19, 0.95) 100%);
+  border: 1.5px solid rgba(212, 175, 55, 0.35);
+  padding: 48px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 245, 220, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.vw-cta-banner-inner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 20%, rgba(212, 175, 55, 0.15) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.vw-cta-title {
+  font-family: 'Cinzel', serif;
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--vw-cream-light);
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.vw-cta-desc {
+  font-size: 16px;
+  color: var(--vw-cream-parchment);
+  max-width: 580px;
+  line-height: 1.6;
+  margin: 0;
+  opacity: 0.9;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════════════════════════════════════════ */
+.vw-footer {
+  border-top: 1px solid rgba(212, 175, 55, 0.14);
+  background: rgba(5, 12, 8, 0.95);
+  padding: 36px 32px;
+  margin-top: auto;
+}
+
+.vw-footer-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.vw-footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--vw-cream-light);
+  letter-spacing: 1px;
+}
+
+.vw-footer-copy {
+  font-size: 12.5px;
+  color: var(--vw-cream-muted);
+  opacity: 0.7;
+}
+
+.vw-footer-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  font-size: 11.5px;
+  color: var(--vw-gold-primary);
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN (TABLET & MOBILE)
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .vw-hero-section {
+    grid-template-columns: 1fr;
+    gap: 48px;
+    padding: 40px 24px 60px;
+  }
+
+  .vw-hero-left {
+    text-align: center;
+    align-items: center;
+  }
+
+  .vw-hero-description {
+    max-width: 620px;
+  }
+
+  .vw-hero-ctas {
+    justify-content: center;
+  }
+
+  .vw-hero-highlights {
+    max-width: 500px;
+    width: 100%;
+  }
+
+  .vw-auth-card-wrapper {
+    max-width: 460px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .vw-steps-grid,
+  .vw-showcase-grid,
+  .vw-pillars-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .vw-header-inner {
+    padding: 14px 20px;
+  }
+
+  .vw-nav-links {
+    display: none;
+  }
+
+  .vw-hero-title {
+    font-size: 38px;
+  }
+
+  .vw-section-title {
+    font-size: 28px;
+  }
+
+  .vw-steps-grid,
+  .vw-showcase-grid,
+  .vw-pillars-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vw-cta-banner-inner {
+    padding: 32px 20px;
+  }
+
+  .vw-cta-title {
+    font-size: 26px;
+  }
+
+  .vw-footer-inner {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .vw-hero-title {
+    font-size: 32px;
+  }
+
+  .vw-btn-hero-primary,
+  .vw-btn-hero-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .vw-hero-highlights {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}

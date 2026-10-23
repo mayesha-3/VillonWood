@@ -22,7 +22,8 @@ export interface VillagerProfession {
     | 'Alimentation et agriculture'
     | 'Artisanat et construction'
     | 'Métiers et artisanat'
-    | 'Accueil et nature';
+    | 'Accueil et nature'
+    | (string & {});
   x: number; // relative percentage (0 - 100)
   y: number; // relative percentage (0 - 100)
   description: string;
