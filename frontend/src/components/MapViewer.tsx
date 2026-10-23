@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import type { VillagerProfession } from '../types/village';
+import { useLanguage } from '../contexts/LanguageContext';
 import mapImage from '../assets/map.png';
 import { 
   Users, MessageSquare, MapPin, Anchor, Flame, Cake, 
@@ -42,6 +43,7 @@ export const MapViewer: React.FC<MapViewerProps> = ({
   villagers,
   onSelectLocation
 }) => {
+  const { t } = useLanguage();
   const containerRef = useRef<HTMLDivElement>(null);
   const mapImageRef = useRef<HTMLImageElement>(null);
 
@@ -186,13 +188,13 @@ export const MapViewer: React.FC<MapViewerProps> = ({
             </div>
           </div>
           <div className="tooltip-structure">
-            <strong>Lieu :</strong> {hoveredVillager.structureName}
+            <strong>{t('mapLocation')}:</strong> {hoveredVillager.structureName}
           </div>
           <div className="tooltip-occupants">
-            <Users size={14} /> <span>{hoveredVillager.activeOccupantsCount} personnes discutent actuellement sur place</span>
+            <Users size={14} /> <span>{hoveredVillager.activeOccupantsCount} {t('mapPeopleOnline')}</span>
           </div>
           <div className="tooltip-action">
-            <MessageSquare size={14} /> Cliquer pour entrer et discuter
+            <MessageSquare size={14} /> {t('mapClickToChat')}
           </div>
         </div>
       )}

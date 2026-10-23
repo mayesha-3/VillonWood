@@ -21,6 +21,65 @@ interface Message {
   time: string;
 }
 
+const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
+
+const SYSTEM_PROMPT = `You are Villon AI — an expert French language tutor and bilingual village guide in the medieval village of VillonWood. You help learners understand French through immersive, context-rich explanations.
+
+When the user asks about a French word, phrase, or topic:
+1. Provide a relevant French sentence naturally related to the topic.
+2. Show the full translation using "=>" (e.g., "La boulangerie est au coin de la rue. => The bakery is at the corner of the street.")
+3. Break down key words/phrases with aligned translations, each on its own line (e.g., "la boulangerie => the bakery")
+
+When the user writes in French, help them understand what they said and gently correct any mistakes.
+When the user greets you, respond warmly in French with a translation.
+
+Keep responses concise (under 150 words). Stay in character as a friendly village tutor. Do not use markdown formatting — just plain text with "=>" for translations.`;
+
+async function queryGroq(conversationHistory: Message[]): Promise<string> {
+  if (!GROQ_API_KEY || GROQ_API_KEY === 'your_groq_api_key_here') {
+    return 'Villon AI is not configured yet. Please add your free Groq API key to the .env file (VITE_GROQ_API_KEY). Get one at console.groq.com';
+  }
+
+  const apiMessages = [
+    { role: 'system' as const, content: SYSTEM_PROMPT },
+    ...conversationHistory.slice(-10).map(m => ({
+      role: (m.sender === 'user' ? 'user' : 'assistant') as 'user' | 'assistant',
+      content: m.text
+    }))
+  ];
+
+  try {
+    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${GROQ_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "qwen/qwen3.8-27b",
+        messages: apiMessages,
+        max_tokens: 500,
+        temperature: 0.7,
+      }),
+    });
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      console.error('Groq API error:', res.status, errData);
+      if (res.status === 429) {
+        return 'The AI is a bit busy right now — too many requests. Please wait a moment and try again.';
+      }
+      return 'Something went wrong connecting to the AI. Please try again in a moment.';
+    }
+
+    const data = await res.json();
+    return data.choices?.[0]?.message?.content || 'I could not generate a response. Please try again.';
+  } catch (err) {
+    console.error('Groq fetch error:', err);
+    return 'Could not reach the AI service. Please check your internet connection and try again.';
+  }
+}
+
 export const Chatbot: React.FC<ChatbotProps> = ({
   isOpen,
   onClose,
@@ -29,7 +88,7 @@ export const Chatbot: React.FC<ChatbotProps> = ({
     {
       id: 'ai-welcome',
       sender: 'ai',
-      text: 'Salutations ! 🏰 I am Villon AI — your bilingual village guide & translator. Ask me anything in English or French!',
+      text: 'Salutations ! I am Villon AI — your bilingual village guide & translator. Ask me anything in English or French!',
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     },
     {
@@ -53,9 +112,9 @@ export const Chatbot: React.FC<ChatbotProps> = ({
 
   if (!isOpen) return null;
 
-  const handleSend = (textOverride?: string) => {
+  const handleSend = async (textOverride?: string) => {
     const text = textOverride || inputText;
-    if (!text.trim()) return;
+    if (!text.trim() || isTyping) return;
 
     const userMsg: Message = {
       id: `user-${Date.now()}`,
@@ -64,110 +123,23 @@ export const Chatbot: React.FC<ChatbotProps> = ({
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
-    setMessages((prev) => [...prev, userMsg]);
+    const updatedMessages = [...messages, userMsg];
+    setMessages(updatedMessages);
     if (!textOverride) setInputText('');
     setIsTyping(true);
 
-    setTimeout(() => {
-      const lower = text.toLowerCase();
-      let reply = '';
+    // Call Groq AI
+    const reply = await queryGroq(updatedMessages);
 
-if (
-  lower.includes("bakery") ||
-  lower.includes("boulangerie") ||
-  lower.includes("bread") ||
-  lower.includes("pain")
-) {
-  reply = `🥖 Le boulanger prépare du pain frais chaque matin.
-=> The baker prepares fresh bread every morning.
+    const aiMsg: Message = {
+      id: `ai-${Date.now()}`,
+      sender: 'ai',
+      text: reply,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
 
-le boulanger => the baker
-prépare => prepares
-du pain frais => fresh bread
-chaque matin => every morning`;
-} else if (
-  lower.includes("boat") ||
-  lower.includes("bateau") ||
-  lower.includes("river") ||
-  lower.includes("rivière")
-) {
-  reply = `⚓ Le capitaine navigue en bateau sur la rivière.
-=> The captain sails by boat on the river.
-
-le capitaine => the captain
-navigue => navigates / sails
-en bateau => by boat
-sur la rivière => on the river`;
-} else if (
-  lower.includes("wine") ||
-  lower.includes("vin") ||
-  lower.includes("vineyard") ||
-  lower.includes("vignoble")
-) {
-  reply = `🍷 Nous dégustons du bon vin dans le vignoble.
-=> We are tasting good wine in the vineyard.
-
-nous dégustons => we taste / we are tasting
-du bon vin => good wine
-dans => in
-le vignoble => the vineyard`;
-} else if (
-  lower.includes("hello") ||
-  lower.includes("bonjour") ||
-  lower.includes("hi") ||
-  lower.includes("salut")
-) {
-  reply = `👋 Bonjour monsieur le maire, bienvenue au village !
-=> Hello Mr. Mayor, welcome to the village!
-
-bonjour => hello / good morning
-monsieur => mister / sir
-le maire => the mayor
-bienvenue => welcome
-au village => to the village`;
-} else if (
-  lower.includes("translate") ||
-  lower.includes("traduire") ||
-  lower.includes("comment dit")
-) {
-  reply = `🌐 Pouvez-vous traduire cette phrase s'il vous plaît ?
-=> Can you translate this sentence please?
-
-pouvez-vous => can you
-traduire => to translate
-cette phrase => this sentence
-s'il vous plaît => please`;
-} else if (
-  lower.includes("forge") ||
-  lower.includes("blacksmith") ||
-  lower.includes("forgeron")
-) {
-  reply = `🔨 Le forgeron travaille le fer chaud dans sa forge.
-=> The blacksmith works hot iron in his forge.
-
-le forgeron => the blacksmith
-travaille => works
-le fer chaud => hot iron
-dans sa forge => in his forge`;
-} else {
-  reply = `🏡 Je visite un joli village aujourd'hui.
-=> I am visiting a pretty village today.
-
-je visite => I visit / I am visiting
-un joli village => a pretty village
-aujourd'hui => today`;
-}
-
-      const aiMsg: Message = {
-        id: `ai-${Date.now()}`,
-        sender: 'ai',
-        text: reply,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-
-      setIsTyping(false);
-      setMessages((prev) => [...prev, aiMsg]);
-    }, 1200);
+    setIsTyping(false);
+    setMessages((prev) => [...prev, aiMsg]);
   };
 
   return (
@@ -209,7 +181,7 @@ aujourd'hui => today`;
             {m.sender === 'ai' && (<div className="vai-msg-avatar"><Bot size={14} /></div>)}
             <div className="vai-bubble-wrap">
               <div className={`vai-bubble ${m.sender === 'user' ? 'vai-bubble-user' : 'vai-bubble-ai'}`}>
-                <p className="vai-bubble-text">{m.text}</p>
+                <p className="vai-bubble-text" style={{ whiteSpace: 'pre-wrap' }}>{m.text}</p>
               </div>
               <span className="vai-msg-time">{m.time}</span>
             </div>
@@ -229,22 +201,21 @@ aujourd'hui => today`;
       {/* QUICK PROMPTS */}
       <div className="vai-quick-prompts">
         {[
-          { emoji: '🥖', text: 'Where is the bakery?' },
-          { emoji: '🍷', text: 'Translate: wine' },
-          { emoji: '👋', text: 'Bonjour !' },
-          { emoji: '⚓', text: 'Tell me about the river' },
+          { label: 'Where is the bakery?', text: 'Where is the bakery?' },
+          { label: 'Translate: wine', text: 'Translate the word "wine" to French and explain it' },
+          { label: 'Bonjour !', text: 'Bonjour !' },
+          { label: 'Village life', text: 'Tell me about daily life in a French village' },
         ].map((p, i) => (
-          <button key={i} type="button" className="vai-prompt-chip" onClick={() => handleSend(`${p.emoji} ${p.text}`)}>
-            <span className="vai-chip-emoji">{p.emoji}</span>
-            <span>{p.text}</span>
+          <button key={i} type="button" className="vai-prompt-chip" onClick={() => handleSend(p.text)}>
+            <span>{p.label}</span>
           </button>
         ))}
       </div>
 
       {/* INPUT */}
       <form onSubmit={(e) => { e.preventDefault(); handleSend(); }} className="vai-input-bar">
-        <input type="text" className="vai-input" placeholder="Type in English or French..." value={inputText} onChange={(e) => setInputText(e.target.value)} />
-        <button type="submit" className="vai-send-btn" disabled={!inputText.trim()} title="Send"><Send size={16} /></button>
+        <input type="text" className="vai-input" placeholder="Type in English or French..." value={inputText} onChange={(e) => setInputText(e.target.value)} disabled={isTyping} />
+        <button type="submit" className="vai-send-btn" disabled={!inputText.trim() || isTyping} title="Send"><Send size={16} /></button>
       </form>
     </div>
   );

@@ -25,3 +25,5 @@ dist-ssr
 
 # Firebase credentials
 src/firebase.ts
+.env
+

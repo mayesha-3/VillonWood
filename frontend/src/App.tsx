@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import GameHUDTopLeft from './components/GameHUDTopLeft';
 import SidebarDock from './components/SidebarDock';
 import MapViewer from './components/MapViewer';
@@ -7,23 +8,33 @@ import SocialMedia from './socialMedia';
 import CameraOverlay from './components/CameraOverlay';
 import MusicPlayerOverlay from './components/MusicPlayerOverlay';
 import SettingsOverlay from './components/SettingsOverlay';
+import AdminDashboard from './components/AdminDashboard';
+import TeacherDashboard from './components/TeacherDashboard';
+import RestrictedBanner from './components/RestrictedBanner';
 import Chatbot from './chatbot';
 import GroupChat from './groupChats';
+import WordsOfTheDay from './components/WordsOfTheDay';
+import QuizModal from './components/QuizModal';
 import AuthModal from './components/AuthModal';
 import { useAuth } from './contexts/AuthContext';
+import { useAdmin } from './contexts/AdminContext';
 import { VILLAGERS_DATA } from './data/villagers';
 import { VILLAGERS_DATA_2 } from './data/villagers2';
 import type { VillagerProfession, ActiveOverlay } from './types/village';
 import LandingPage from './components/LandingPage';
 import { Feather, Sparkles } from 'lucide-react';
 
-export const App: React.FC = () => {
+const VillageView: React.FC = () => {
   const { user, loading } = useAuth();
+  const { isCurrentUserRestricted } = useAdmin();
+  const navigate = useNavigate();
+
   const [activeOverlay, setActiveOverlay] = useState<ActiveOverlay>(null);
   const [selectedLocation, setSelectedLocation] = useState<VillagerProfession | null>(null);
   const [isAIOpen, setIsAIOpen] = useState<boolean>(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showHUD, setShowHUD] = useState<boolean>(false);
+  const [showQuiz, setShowQuiz] = useState(false);
 
   // Active Zone: 'rural' (Village de Villon) or 'city2' (Cité 2000 - Zone Avancée)
   // Supports URL query param ?zone=city2 or ?zone=advanced for teacher gating
@@ -54,6 +65,10 @@ export const App: React.FC = () => {
     }
     if (overlay === 'ai') {
       setIsAIOpen((prev) => !prev);
+    } else if (overlay === 'admin') {
+      navigate('/mod');
+    } else if (overlay === 'teacher') {
+      navigate('/teacher');
     } else {
       setActiveOverlay(overlay);
     }
@@ -74,6 +89,8 @@ export const App: React.FC = () => {
 
   return (
     <div className="villon-app-layout">
+      {isCurrentUserRestricted && <RestrictedBanner />}
+
       {/* Zone Switcher (Village Ancien vs Cité 2000 Avancée) */}
       <div className="vw-zone-switcher-pill">
         <button
@@ -93,13 +110,16 @@ export const App: React.FC = () => {
           <span>🏙 Cité 2000 (Avancé)</span>
         </button>
       </div>
-     
+
+      {/* Top-Left Tactical Videogame HUD */}
       {showHUD && (
         <GameHUDTopLeft 
           totalVillagers={activeVillagers.length} 
           onLogin={() => setShowAuthModal(true)} 
         />
       )}
+
+      {/* Main Interactive Map Viewport */}
       <main className="main-content-viewport">
         {activeZone === 'rural' ? (
           <MapViewer
@@ -114,7 +134,7 @@ export const App: React.FC = () => {
         )}
       </main>
 
-  
+      {/* Sidebar Dock */}
       <SidebarDock
         activeOverlay={activeOverlay}
         onOpenOverlay={handleOpenOverlay}
@@ -122,6 +142,7 @@ export const App: React.FC = () => {
         onToggleHUD={() => setShowHUD((prev) => !prev)}
       />
 
+      {/* Gated: Villon Media */}
       {user && activeOverlay === 'media' && (
         <SocialMedia onClose={() => setActiveOverlay(null)} />
       )}
@@ -136,9 +157,11 @@ export const App: React.FC = () => {
           onClose={() => setActiveOverlay(null)}
           showHUD={showHUD}
           onToggleHUD={() => setShowHUD((prev) => !prev)}
+          onOpenAdminDashboard={() => navigate('/mod')}
         />
       )}
 
+      {/* Gated: Floating AI Chatbot */}
       {user && (
         <Chatbot
           isOpen={isAIOpen}
@@ -146,6 +169,7 @@ export const App: React.FC = () => {
         />
       )}
 
+      {/* Gated: Floating AI Trigger Fab */}
       {user && !isAIOpen && (
         <button
           type="button"
@@ -177,6 +201,7 @@ export const App: React.FC = () => {
         </button>
       )}
 
+      {/* Gated: Group Chat */}
       {user && selectedLocation && (
         <GroupChat
           location={selectedLocation}
@@ -184,10 +209,42 @@ export const App: React.FC = () => {
         />
       )}
 
+      {/* Auth Modal Popup */}
       {showAuthModal && (
         <AuthModal onClose={() => setShowAuthModal(false)} />
       )}
+
+      {/* Words of the Day floating card (students see this on the map) */}
+      {user && <WordsOfTheDay />}
+
+      {/* Weekly Quiz Modal */}
+      {user && (
+        <QuizModal
+          isOpen={showQuiz}
+          onClose={() => setShowQuiz(false)}
+        />
+      )}
     </div>
+  );
+};
+
+const ModPage: React.FC = () => {
+  const navigate = useNavigate();
+  return <AdminDashboard onBackToMap={() => navigate('/')} />;
+};
+
+const TeacherPage: React.FC = () => {
+  const navigate = useNavigate();
+  return <TeacherDashboard onBackToMap={() => navigate('/')} />;
+};
+
+export const App: React.FC = () => {
+  return (
+    <Routes>
+      <Route path="/" element={<VillageView />} />
+      <Route path="/mod" element={<ModPage />} />
+      <Route path="/teacher" element={<TeacherPage />} />
+    </Routes>
   );
 };
 

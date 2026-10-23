@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Castle, Users, Radio, Shield, Settings, LogOut, User, Check, X, LogIn } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface GameHUDTopLeftProps {
   totalVillagers?: number;
@@ -12,6 +13,7 @@ export const GameHUDTopLeft: React.FC<GameHUDTopLeftProps> = ({
   onLogin
 }) => {
   const { user, logout } = useAuth();
+  const { t } = useLanguage();
   const [showSettings, setShowSettings] = useState(false);
   const [usernameInput, setUsernameInput] = useState('');
   const [displayName, setDisplayName] = useState('');
@@ -47,7 +49,7 @@ export const GameHUDTopLeft: React.FC<GameHUDTopLeftProps> = ({
           <div className="ff-user-bar">
             <button className="ff-login-btn" onClick={onLogin}>
               <LogIn size={11} />
-              <span>Se connecter</span>
+              <span>{t('hudLogin')}</span>
             </button>
           </div>
         )}
@@ -56,7 +58,7 @@ export const GameHUDTopLeft: React.FC<GameHUDTopLeftProps> = ({
         <div className="ff-hud-statusbar">
           <div className="ff-server-status">
             <span className="ff-live-dot" />
-            <span className="ff-status-text">SRV // VILLON-FRANCE</span>
+            <span className="ff-status-text">{t('hudServer')}</span>
           </div>
           <div className="ff-hud-ping">
             <Radio size={12} className="ff-ping-icon" />
@@ -81,7 +83,7 @@ export const GameHUDTopLeft: React.FC<GameHUDTopLeftProps> = ({
               <span className="ff-badge-tag">RPG</span>
             </div>
             <div className="ff-brand-sub">
-              <span>LE MONDE DES 20 MÉTIERS</span>
+              <span>{t('hudWorld')}</span>
             </div>
           </div>
         </div>
@@ -94,14 +96,14 @@ export const GameHUDTopLeft: React.FC<GameHUDTopLeftProps> = ({
               <span className="ff-alive-pulse-ring" />
             </div>
             <div className="ff-alive-data">
-              <span className="ff-alive-label">ALIVE / CITOYENS</span>
+              <span className="ff-alive-label">{t('hudAlive')}</span>
               <span className="ff-alive-number">{totalVillagers}</span>
             </div>
           </div>
           <div className="ff-gauge-cluster">
             <div className="ff-gauge-label">
-              <span>STATUT DU VILLAGE</span>
-              <span className="ff-gauge-val">100% ACTIF</span>
+              <span>{t('hudStatus')}</span>
+              <span className="ff-gauge-val">{t('hudActive')}</span>
             </div>
             <div className="ff-gauge-track">
               <div className="ff-gauge-bar" style={{ width: '100%' }} />
@@ -112,13 +114,13 @@ export const GameHUDTopLeft: React.FC<GameHUDTopLeftProps> = ({
         {/* Settings & Logout bar — only when logged in */}
         {user && (
           <div className="ff-actions-bar">
-            <button className="ff-action-btn" onClick={() => { setShowSettings(!showSettings); setUsernameInput(displayName); }} title="Paramètres">
+            <button className="ff-action-btn" onClick={() => { setShowSettings(!showSettings); setUsernameInput(displayName); }} title={t('hudSettings')}>
               <Settings size={13} />
-              <span>Paramètres</span>
+              <span>{t('hudSettings')}</span>
             </button>
-            <button className="ff-action-btn ff-logout-btn" onClick={logout} title="Déconnexion">
+            <button className="ff-action-btn ff-logout-btn" onClick={logout} title={t('hudLogout')}>
               <LogOut size={13} />
-              <span>Déconnexion</span>
+              <span>{t('hudLogout')}</span>
             </button>
           </div>
         )}
@@ -127,12 +129,12 @@ export const GameHUDTopLeft: React.FC<GameHUDTopLeftProps> = ({
       {/* Settings dropdown */}
       {showSettings && (
         <div className="ff-settings-dropdown">
-          <label className="ff-settings-label">Nom d'utilisateur</label>
+          <label className="ff-settings-label">{t('hudUsername')}</label>
           <div className="ff-settings-input-row">
             <input
               type="text"
               className="ff-settings-input"
-              placeholder={shownName || 'Entrez un pseudo...'}
+              placeholder={shownName || t('hudUsernamePlaceholder')}
               value={usernameInput}
               onChange={(e) => setUsernameInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSaveUsername()}
