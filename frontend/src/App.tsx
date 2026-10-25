@@ -3,6 +3,7 @@ import { Routes, Route, useNavigate } from 'react-router-dom';
 import GameHUDTopLeft from './components/GameHUDTopLeft';
 import SidebarDock from './components/SidebarDock';
 import MapViewer from './components/MapViewer';
+import MapViewer2 from './components/MapViewer2';
 import SocialMedia from './socialMedia';
 import CameraOverlay from './components/CameraOverlay';
 import MusicPlayerOverlay from './components/MusicPlayerOverlay';
@@ -18,7 +19,9 @@ import AuthModal from './components/AuthModal';
 import { useAuth } from './contexts/AuthContext';
 import { useAdmin } from './contexts/AdminContext';
 import { VILLAGERS_DATA } from './data/villagers';
+import { VILLAGERS_DATA_2 } from './data/villagers2';
 import type { VillagerProfession, ActiveOverlay } from './types/village';
+import LandingPage from './components/LandingPage';
 import { Feather, Sparkles } from 'lucide-react';
 import { isMondayUTC } from './utils/dateUtils';
 
@@ -41,6 +44,20 @@ const VillageView: React.FC = () => {
     const timer = window.setInterval(refreshQuizDay, 60_000);
     return () => window.clearInterval(timer);
   }, []);
+
+  // Active Zone: 'rural' (Village de Villon) or 'city2' (Cité 2000 - Zone Avancée)
+  // Supports URL query param ?zone=city2 or ?zone=advanced for teacher gating
+  const [activeZone, setActiveZone] = useState<'rural' | 'city2'>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('zone') === 'city2' || params.get('zone') === 'advanced') {
+        return 'city2';
+      }
+    }
+    return 'rural';
+  });
+
+  const activeVillagers = activeZone === 'city2' ? VILLAGERS_DATA_2 : VILLAGERS_DATA;
 
   const handleSelectLocation = (location: VillagerProfession) => {
     if (!user) {
@@ -74,14 +91,39 @@ const VillageView: React.FC = () => {
     );
   }
 
+  // Display the dedicated welcome/cover landing page for unauthenticated visitors
+  if (!user) {
+    return <LandingPage />;
+  }
+
   return (
     <div className="villon-app-layout">
       {isCurrentUserRestricted && <RestrictedBanner />}
 
+      {/* Zone Switcher (Village Ancien vs Cité 2000 Avancée) */}
+      <div className="vw-zone-switcher-pill">
+        <button
+          type="button"
+          className={`vw-zone-btn ${activeZone === 'rural' ? 'active' : ''}`}
+          onClick={() => { setActiveZone('rural'); setSelectedLocation(null); }}
+          title="Zone Rurale : Village Ancien de Villon"
+        >
+          <span>🌲 Village Ancien</span>
+        </button>
+        <button
+          type="button"
+          className={`vw-zone-btn city ${activeZone === 'city2' ? 'active' : ''}`}
+          onClick={() => { setActiveZone('city2'); setSelectedLocation(null); }}
+          title="Zone Avancée : Cité Française Années 2000"
+        >
+          <span>🏙 Cité 2000 (Avancé)</span>
+        </button>
+      </div>
+
       {/* Top-Left Tactical Videogame HUD */}
       {showHUD && (
         <GameHUDTopLeft 
-          totalVillagers={VILLAGERS_DATA.length} 
+          totalVillagers={activeVillagers.length} 
           onLogin={() => setShowAuthModal(true)} 
           onShowWordsOfTheDay={() => setWordsReopenToken((token) => token + 1)}
         />
@@ -89,10 +131,17 @@ const VillageView: React.FC = () => {
 
       {/* Main Interactive Map Viewport */}
       <main className="main-content-viewport">
-        <MapViewer
-          villagers={VILLAGERS_DATA}
-          onSelectLocation={handleSelectLocation}
-        />
+        {activeZone === 'rural' ? (
+          <MapViewer
+            villagers={VILLAGERS_DATA}
+            onSelectLocation={handleSelectLocation}
+          />
+        ) : (
+          <MapViewer2
+            villagers={VILLAGERS_DATA_2}
+            onSelectLocation={handleSelectLocation}
+          />
+        )}
       </main>
 
       {/* Sidebar Dock */}
