@@ -14,12 +14,14 @@ import {
 import { onAuthStateChanged } from 'firebase/auth';
 
 export type UserAppRole = 'learner' | 'teacher' | 'admin';
+export type UserCourse = 'village' | 'advanced';
 
 export interface AdminUserData {
   id: string;
   name: string;
   email: string;
   role: UserAppRole;
+  course: UserCourse;
   approvedRole: boolean;
   isRestricted: boolean;
   joinedDate: string;
@@ -29,11 +31,12 @@ export interface AdminUserData {
 
 interface AdminContextType {
   currentUserRole: UserAppRole;
+  currentUserCourse: UserCourse;
   isCurrentUserRestricted: boolean;
   usersList: AdminUserData[];
   loading: boolean;
-  setCurrentUserRole: (role: UserAppRole) => void;
   updateUserRole: (userId: string, newRole: UserAppRole) => void;
+  updateUserCourse: (userId: string, course: UserCourse) => void;
   approveUserRole: (userId: string) => void;
   toggleUserRestriction: (userId: string) => void;
   deleteUserAccount: (userId: string) => void;
@@ -57,6 +60,7 @@ function formatDate(ts: Timestamp | string | undefined): string {
 
 export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUserRole, setCurrentUserRoleState] = useState<UserAppRole>('learner');
+  const [currentUserCourse, setCurrentUserCourse] = useState<UserCourse>('village');
   const [isCurrentUserRestricted, setIsCurrentUserRestricted] = useState(false);
   const [usersList, setUsersList] = useState<AdminUserData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -66,6 +70,8 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const user = auth.currentUser;
     if (!user) return;
 
+    const isMainAdmin = user.email?.trim().toLowerCase() === 'mayeshaafrooz@gmail.com';
+
     const userRef = doc(db, 'users', user.uid);
     const userSnap = await getDoc(userRef);
 
@@ -74,18 +80,24 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       await setDoc(userRef, {
         displayName: user.displayName || user.email?.split('@')[0] || 'Villager',
         email: user.email || '',
-        role: 'learner',
-        approvedRole: false,
+        role: isMainAdmin ? 'admin' : 'learner',
+        course: 'village',
+        approvedRole: isMainAdmin,
         isRestricted: false,
         joinedDate: serverTimestamp(),
         lastActive: serverTimestamp(),
         totalOnlineMinutes: 0
       });
-      setCurrentUserRoleState('learner');
+      setCurrentUserRoleState(isMainAdmin ? 'admin' : 'learner');
+      setCurrentUserCourse('village');
       setIsCurrentUserRestricted(false);
     } else {
       const data = userSnap.data();
-      setCurrentUserRoleState(data.role || 'learner');
+      if (isMainAdmin && (data.role !== 'admin' || !data.approvedRole)) {
+        await updateDoc(userRef, { role: 'admin', approvedRole: true });
+      }
+      setCurrentUserRoleState(isMainAdmin ? 'admin' : (data.role || 'learner'));
+      setCurrentUserCourse(data.course === 'advanced' ? 'advanced' : 'village');
       setIsCurrentUserRestricted(data.isRestricted || false);
     }
 
@@ -100,6 +112,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         await syncCurrentUser();
       } else {
         setCurrentUserRoleState('learner');
+        setCurrentUserCourse('village');
         setIsCurrentUserRestricted(false);
       }
       setLoading(false);
@@ -117,6 +130,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           name: data.displayName || data.email || 'Unknown',
           email: data.email || '',
           role: data.role || 'learner',
+          course: data.course === 'advanced' ? 'advanced' : 'village',
           approvedRole: data.approvedRole ?? false,
           isRestricted: data.isRestricted ?? false,
           joinedDate: formatDate(data.joinedDate),
@@ -147,15 +161,20 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return () => clearInterval(interval);
   }, []);
 
-  const setCurrentUserRole = (role: UserAppRole) => {
-    setCurrentUserRoleState(role);
-  };
-
   const updateUserRole = async (userId: string, newRole: UserAppRole) => {
     try {
       await updateDoc(doc(db, 'users', userId), { role: newRole, approvedRole: false });
     } catch (err) {
       console.error('Failed to update user role:', err);
+    }
+  };
+
+  const updateUserCourse = async (userId: string, course: UserCourse) => {
+    try {
+      await updateDoc(doc(db, 'users', userId), { course });
+      if (userId === auth.currentUser?.uid) setCurrentUserCourse(course);
+    } catch (err) {
+      console.error('Failed to update user course:', err);
     }
   };
 
@@ -195,11 +214,12 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     <AdminContext.Provider
       value={{
         currentUserRole,
+        currentUserCourse,
         isCurrentUserRestricted,
         usersList,
         loading,
-        setCurrentUserRole,
         updateUserRole,
+        updateUserCourse,
         approveUserRole,
         toggleUserRestriction,
         deleteUserAccount,

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import GameHUDTopLeft from './components/GameHUDTopLeft';
 import SidebarDock from './components/SidebarDock';
 import MapViewer from './components/MapViewer';
@@ -25,9 +25,9 @@ import LandingPage from './components/LandingPage';
 import { Feather, Sparkles } from 'lucide-react';
 import { isMondayUTC } from './utils/dateUtils';
 
-const VillageView: React.FC = () => {
+const VillageView: React.FC<{ city?: boolean }> = ({ city = false }) => {
   const { user, loading } = useAuth();
-  const { isCurrentUserRestricted, currentUserRole } = useAdmin();
+  const { isCurrentUserRestricted, currentUserRole, currentUserCourse } = useAdmin();
   const navigate = useNavigate();
 
   const [activeOverlay, setActiveOverlay] = useState<ActiveOverlay>(null);
@@ -45,17 +45,7 @@ const VillageView: React.FC = () => {
     return () => window.clearInterval(timer);
   }, []);
 
-  // Active Zone: 'rural' (Village de Villon) or 'city2' (Cité 2000 - Zone Avancée)
-  // Supports URL query param ?zone=city2 or ?zone=advanced for teacher gating
-  const [activeZone, setActiveZone] = useState<'rural' | 'city2'>(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get('zone') === 'city2' || params.get('zone') === 'advanced') {
-        return 'city2';
-      }
-    }
-    return 'rural';
-  });
+  const activeZone = city ? 'city2' : 'rural';
 
   const activeVillagers = activeZone === 'city2' ? VILLAGERS_DATA_2 : VILLAGERS_DATA;
 
@@ -91,6 +81,9 @@ const VillageView: React.FC = () => {
     );
   }
 
+  if (city && currentUserCourse !== 'advanced') return <Navigate to="/village" replace />;
+  if (!city && currentUserCourse === 'advanced') return <Navigate to="/city" replace />;
+
   // Display the dedicated welcome/cover landing page for unauthenticated visitors
   if (!user) {
     return <LandingPage />;
@@ -100,24 +93,10 @@ const VillageView: React.FC = () => {
     <div className="villon-app-layout">
       {isCurrentUserRestricted && <RestrictedBanner />}
 
-      {/* Zone Switcher (Village Ancien vs Cité 2000 Avancée) */}
-      <div className="vw-zone-switcher-pill">
-        <button
-          type="button"
-          className={`vw-zone-btn ${activeZone === 'rural' ? 'active' : ''}`}
-          onClick={() => { setActiveZone('rural'); setSelectedLocation(null); }}
-          title="Zone Rurale : Village Ancien de Villon"
-        >
-          <span>🌲 Village Ancien</span>
-        </button>
-        <button
-          type="button"
-          className={`vw-zone-btn city ${activeZone === 'city2' ? 'active' : ''}`}
-          onClick={() => { setActiveZone('city2'); setSelectedLocation(null); }}
-          title="Zone Avancée : Cité Française Années 2000"
-        >
-          <span>🏙 Cité 2000 (Avancé)</span>
-        </button>
+      <div className="vw-zone-switcher-pill" aria-label="Ville actuelle">
+        <span className={`vw-zone-btn active ${city ? 'city' : ''}`}>
+          {city ? '🏙 Cité 2000 (Avancé)' : '🌲 Village Ancien'}
+        </span>
       </div>
 
       {/* Top-Left Tactical Videogame HUD */}
@@ -248,6 +227,10 @@ const VillageView: React.FC = () => {
 
 const ModPage: React.FC = () => {
   const navigate = useNavigate();
+  const { currentUserRole, loading } = useAdmin();
+  const { user, loading: authLoading } = useAuth();
+  if (loading || authLoading) return <div className="villon-app-layout" />;
+  if (!user || currentUserRole !== 'admin') return <Navigate to="/village" replace />;
   return <AdminDashboard onBackToMap={() => navigate('/')} />;
 };
 
@@ -260,6 +243,8 @@ export const App: React.FC = () => {
   return (
     <Routes>
       <Route path="/" element={<VillageView />} />
+      <Route path="/village" element={<VillageView />} />
+      <Route path="/city" element={<VillageView city />} />
       <Route path="/mod" element={<ModPage />} />
       <Route path="/teacher" element={<TeacherPage />} />
     </Routes>

@@ -2547,7 +2547,7 @@ body, html {
 .villon-sidebar-dock {
   position: fixed;
   right: 20px;
-  top: 60%;
+  top: 49%;
   transform: translateY(-50%);
   z-index: 150;
   display: flex;
@@ -4012,6 +4012,384 @@ body:has(.admin-dashboard-page) #root,
   box-shadow: 0 2px 10px rgba(2, 132, 199, 0.4);
 }
 
+/* ADMIN + TEACHER DASHBOARDS: match Villonwood's forest, ivory, and gold theme */
+.admin-dashboard-page,
+.teacher-dashboard-page {
+  color: #eee9dc !important;
+  background:
+    radial-gradient(ellipse at 85% 10%, rgba(102, 111, 50, 0.2), transparent 38%),
+    radial-gradient(ellipse at 12% 80%, rgba(20, 79, 53, 0.25), transparent 45%),
+    linear-gradient(145deg, #07130e 0%, #0c2117 52%, #08150f 100%) !important;
+}
+
+.admin-navbar,
+.teacher-navbar {
+  background: rgba(7, 19, 14, 0.96) !important;
+  border-bottom: 1px solid rgba(205, 161, 55, 0.25) !important;
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.24) !important;
+}
+
+.admin-brand h2,
+.teacher-brand h2,
+.admin-dashboard-page .stat-value,
+.teacher-dashboard-page .stat-value,
+.admin-dashboard-page .section-title h3,
+.teacher-dashboard-page .section-title h3,
+.admin-dashboard-page .user-fullname,
+.teacher-dashboard-page .user-fullname,
+.teacher-dashboard-page h4 {
+  color: #f5f0e4 !important;
+}
+
+.admin-icon-glow,
+.teacher-icon-glow,
+.teacher-dashboard-page .section-title svg,
+.admin-dashboard-page .section-title svg,
+.teacher-dashboard-page .teacher-notice-icon {
+  color: #d9aa3a !important;
+}
+
+.admin-profile-badge,
+.teacher-profile-badge,
+.back-map-btn,
+.teacher-dashboard-page .back-map-btn {
+  background: rgba(17, 43, 30, 0.92) !important;
+  border-color: rgba(205, 161, 55, 0.32) !important;
+  color: #e5dcc5 !important;
+}
+
+.admin-dashboard-page .stat-card,
+.admin-section-container,
+.teacher-dashboard-page .stat-card,
+.teacher-dashboard-page .teacher-section-container {
+  background: rgba(13, 35, 24, 0.92) !important;
+  border: 1px solid rgba(205, 161, 55, 0.23) !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2) !important;
+}
+
+.admin-dashboard-page .stat-label,
+.admin-dashboard-page .role-summary-title,
+.admin-dashboard-page .role-summary-timer,
+.admin-dashboard-page .admin-table th,
+.admin-dashboard-page .user-email,
+.admin-dashboard-page .section-title,
+.teacher-dashboard-page .stat-label,
+.teacher-dashboard-page .teacher-section-desc,
+.teacher-dashboard-page .teacher-input-label,
+.teacher-dashboard-page .teacher-table th,
+.teacher-dashboard-page .teacher-table td,
+.teacher-dashboard-page .teacher-quiz-closed-notice p,
+.teacher-dashboard-page .teacher-quiz-closed-notice h4 {
+  color: #c9c1ad !important;
+}
+
+.admin-dashboard-page .role-summary-name {
+  color: #e0b744 !important;
+}
+
+.admin-dashboard-page .role-summary-badge,
+.teacher-dashboard-page .teacher-date-tag,
+.teacher-dashboard-page .teacher-slot-badge,
+.teacher-dashboard-page .teacher-q-number {
+  background: rgba(205, 161, 55, 0.16) !important;
+  color: #e4bd5c !important;
+}
+
+.admin-dashboard-page .admin-search-input,
+.admin-dashboard-page .role-select-dropdown,
+.teacher-dashboard-page .teacher-search-input,
+.teacher-dashboard-page .teacher-text-input,
+.teacher-dashboard-page .teacher-textarea-input,
+.teacher-dashboard-page .teacher-opt-input {
+  background: #091a11 !important;
+  border-color: rgba(205, 161, 55, 0.3) !important;
+  color: #f1ebdc !important;
+}
+
+.admin-dashboard-page .admin-search-input::placeholder,
+.teacher-dashboard-page input::placeholder,
+.teacher-dashboard-page textarea::placeholder {
+  color: #a99d82 !important;
+}
+
+.admin-dashboard-page .admin-table th,
+.admin-dashboard-page .admin-table td,
+.teacher-dashboard-page .teacher-table th,
+.teacher-dashboard-page .teacher-table td,
+.teacher-dashboard-page .teacher-section-header {
+  border-color: rgba(205, 161, 55, 0.16) !important;
+}
+
+.admin-dashboard-page .admin-table tr:hover,
+.teacher-dashboard-page .teacher-table tbody tr:hover {
+  background: rgba(205, 161, 55, 0.07) !important;
+}
+
+.admin-dashboard-page .tab-btn.active,
+.teacher-dashboard-page .teacher-open-test-btn,
+.teacher-dashboard-page .teacher-add-q-btn,
+.teacher-dashboard-page .teacher-monday-badge.active,
+.admin-dashboard-page .user-avatar-mini,
+.teacher-dashboard-page .teacher-q-number {
+  background: linear-gradient(135deg, #d9a637, #a9761e) !important;
+  border-color: #e3bd60 !important;
+  color: #102016 !important;
+}
+
+.admin-dashboard-page .approve-btn,
+.admin-dashboard-page .status-badge.green,
+.teacher-dashboard-page .teacher-published-status,
+.teacher-dashboard-page .teacher-status-pill.online {
+  background: rgba(53, 128, 81, 0.18) !important;
+  border-color: rgba(102, 177, 122, 0.36) !important;
+  color: #b6d9ad !important;
+}
+
+.admin-dashboard-page .tab-btn,
+.admin-dashboard-page .action-btn,
+.teacher-dashboard-page .teacher-add-q-btn {
+  color: #e7dfcd !important;
+  border-color: rgba(205, 161, 55, 0.26) !important;
+}
+
+.admin-dashboard-page .action-btn.delete,
+.admin-dashboard-page .status-badge.red,
+.teacher-dashboard-page .teacher-error-banner {
+  background: rgba(130, 41, 31, 0.2) !important;
+  color: #efb5a8 !important;
+}
+
+.teacher-dashboard-page .teacher-word-card,
+.teacher-dashboard-page .teacher-question-card,
+.teacher-dashboard-page .teacher-quiz-closed-notice,
+.teacher-dashboard-page .teacher-table-wrapper {
+  background: rgba(7, 25, 16, 0.78) !important;
+  border-color: rgba(205, 161, 55, 0.2) !important;
+}
+
+.teacher-dashboard-page .teacher-hours-badge,
+.teacher-dashboard-page .teacher-opt-letter {
+  background: rgba(205, 161, 55, 0.15) !important;
+  color: #e4bd5c !important;
+}
+
+/* Quiz option controls stay readable in both selected and unselected states. */
+.teacher-dashboard-page .teacher-option-row {
+  background: #091a11 !important;
+  border-color: rgba(205, 161, 55, 0.28) !important;
+}
+
+.teacher-dashboard-page .teacher-option-row:has(input[type="radio"]:checked) {
+  background: rgba(205, 161, 55, 0.13) !important;
+  border-color: #d9aa3a !important;
+}
+
+.teacher-dashboard-page .teacher-option-row .teacher-opt-input {
+  background: transparent !important;
+  color: #f1ebdc !important;
+  -webkit-text-fill-color: #f1ebdc !important;
+}
+
+.teacher-dashboard-page .teacher-option-row .teacher-opt-input::placeholder {
+  color: #a99d82 !important;
+  -webkit-text-fill-color: #a99d82 !important;
+}
+
+.teacher-dashboard-page .teacher-table thead tr {
+  background: #102b1d !important;
+}
+
+.teacher-dashboard-page .teacher-table thead th {
+  color: #e4bd5c !important;
+}
+
+.admin-dashboard-page button:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
+/* Maps and pop-up panels share the forest-green / ivory / gold palette. */
+.map-hotspot-pin:not(.pin-city-hotspot) .pin-pulse-ring {
+  background: rgba(39, 119, 75, 0.32) !important;
+  border-color: #66a875 !important;
+}
+
+.map-hotspot-pin:not(.pin-city-hotspot) .pin-icon-badge {
+  background: linear-gradient(145deg, #28784c, #12452f) !important;
+  border-color: #d6b44e !important;
+  color: #fff8e8 !important;
+  box-shadow: 0 4px 12px rgba(4, 25, 15, 0.55), 0 0 0 1px rgba(214, 180, 78, 0.24) !important;
+}
+
+.map-hotspot-pin:not(.pin-city-hotspot):hover .pin-icon-badge {
+  background: linear-gradient(145deg, #39945e, #1b5d3b) !important;
+  box-shadow: 0 0 18px rgba(68, 168, 101, 0.55) !important;
+}
+
+.overlay-backdrop:has(.settings-modal-container),
+.overlay-backdrop:has(.music-modal-container),
+.overlay-backdrop:has(.camera-modal-container),
+.submodal-overlay {
+  background: rgba(3, 14, 9, 0.72) !important;
+}
+
+.settings-modal-container,
+.music-modal-container,
+.camera-modal-container,
+.submodal-container {
+  background: linear-gradient(155deg, #10291d, #091a12) !important;
+  border: 1px solid rgba(214, 180, 78, 0.38) !important;
+  color: #f1ead8 !important;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5), 0 0 28px rgba(43, 103, 65, 0.16) !important;
+}
+
+.settings-title,
+.music-title,
+.track-details h3,
+.settings-modal-container h3,
+.submodal-header h3 {
+  color: #f4eddb !important;
+}
+
+.settings-icon,
+.music-icon,
+.camera-icon {
+  color: #e0b84e !important;
+}
+
+.settings-label,
+.playlist-title,
+.option-label,
+.camera-title,
+.submodal-label,
+.submodal-desc,
+.role-french,
+.role-desc,
+.toggle-info,
+.toggle-info span,
+.volume-slider-row {
+  color: #d1c6ac !important;
+}
+
+.settings-label {
+  border-color: rgba(214, 180, 78, 0.2) !important;
+}
+
+.settings-input,
+.submodal-select,
+.submodal-textarea {
+  background: #08180f !important;
+  border-color: rgba(214, 180, 78, 0.34) !important;
+  color: #f4eddb !important;
+}
+
+.daily-role-card,
+.setting-toggle-row,
+.action-pill-btn,
+.playlist-item,
+.track-nav-btn {
+  background: #142f21 !important;
+  border-color: rgba(214, 180, 78, 0.24) !important;
+  color: #eee5cf !important;
+}
+
+.role-name,
+.playlist-item,
+.action-pill-btn {
+  color: #eee5cf !important;
+}
+
+.role-icon-box {
+  background: rgba(214, 180, 78, 0.14) !important;
+}
+
+.role-timer-row,
+.save-success-msg {
+  background: rgba(44, 111, 69, 0.24) !important;
+  border-color: rgba(117, 184, 125, 0.32) !important;
+  color: #bfe0b6 !important;
+}
+
+.close-modal-btn {
+  background: #183524 !important;
+  border-color: rgba(214, 180, 78, 0.3) !important;
+  color: #e9dfc7 !important;
+}
+
+.lang-pill-btn,
+.admin-dashboard-launch-btn,
+.test-sound-btn,
+.setting-toggle-row,
+.action-pill-btn,
+.track-nav-btn,
+.filter-btn,
+.submodal-cancel-btn {
+  border-color: rgba(214, 180, 78, 0.32) !important;
+}
+
+.lang-pill-btn,
+.admin-dashboard-launch-btn,
+.test-sound-btn,
+.filter-btn {
+  background: #142f21 !important;
+  color: #e9dfc7 !important;
+}
+
+.lang-pill-btn.active,
+.admin-dashboard-launch-btn:hover,
+.filter-btn.active,
+.filter-btn:hover {
+  background: linear-gradient(135deg, #d9aa3a, #a9761e) !important;
+  border-color: #e5c568 !important;
+  color: #102016 !important;
+}
+
+.save-settings-btn,
+.play-pause-btn,
+.submodal-submit-btn,
+.submodal-confirm-delete-btn {
+  background: linear-gradient(135deg, #d9aa3a, #a9761e) !important;
+  color: #102016 !important;
+  box-shadow: 0 5px 16px rgba(173, 126, 34, 0.25) !important;
+}
+
+.now-playing-disc {
+  background: radial-gradient(circle, #1d5234, #0a1c12) !important;
+  border-color: #d9aa3a !important;
+  color: #e6bd52 !important;
+}
+
+.mood-badge,
+.playlist-item.active,
+.playlist-item:hover {
+  background: rgba(214, 180, 78, 0.13) !important;
+  border-color: #c89b37 !important;
+  color: #e8c765 !important;
+}
+
+.camera-viewfinder {
+  border-color: #d9aa3a !important;
+}
+
+.shutter-btn {
+  border-color: #d9aa3a !important;
+  box-shadow: 0 4px 14px rgba(173, 126, 34, 0.32) !important;
+}
+
+.download-btn,
+.shutter-inner {
+  background: linear-gradient(135deg, #d9aa3a, #a9761e) !important;
+  color: #102016 !important;
+}
+
+.submodal-container input,
+.submodal-container textarea,
+.submodal-container select {
+  background: #08180f !important;
+  border-color: rgba(214, 180, 78, 0.32) !important;
+  color: #f1ead8 !important;
+}
+
 /* ═══════════════════════════════════════════════════════════════
    2000s CITY HOTSPOT PINS & TOOLTIPS
    ═══════════════════════════════════════════════════════════════ */
@@ -4027,4 +4405,175 @@ body:has(.admin-dashboard-page) #root,
 .hover-tooltip-city {
   border: 1.5px solid rgba(56, 189, 248, 0.45) !important;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 25px rgba(56, 189, 248, 0.2) !important;
+}
+
+/* Map HUD and sidebar dock: complete the forest-green, ivory, and gold theme. */
+.ff-hud-plate {
+  background: linear-gradient(145deg, rgba(13, 35, 24, 0.96), rgba(7, 22, 15, 0.96)) !important;
+  border-color: rgba(214, 180, 78, 0.48) !important;
+  box-shadow: 0 14px 38px rgba(0, 0, 0, 0.42), 0 0 24px rgba(39, 119, 75, 0.2), inset 0 1px 0 rgba(232, 202, 120, 0.12) !important;
+  color: #eee5cf;
+}
+
+.ff-corner-tl,
+.ff-corner-tr,
+.ff-corner-bl,
+.ff-corner-br { border-color: #d9aa3a !important; }
+
+.ff-user-bar,
+.ff-hud-statusbar,
+.ff-actions-bar { border-color: rgba(214, 180, 78, 0.24) !important; }
+
+.ff-user-name,
+.ff-server-status,
+.ff-brand-title,
+.ff-alive-number { color: #f4eddb !important; }
+
+.ff-hud-ping,
+.ff-ping-icon,
+.ff-brand-sub,
+.ff-alive-label,
+.ff-gauge-label,
+.ff-action-btn { color: #c9bea4 !important; }
+
+.ff-crest-inner {
+  background: linear-gradient(145deg, #28784c, #0d3825) !important;
+  border-color: #d9aa3a !important;
+  color: #f9f1da !important;
+}
+
+.ff-badge-tag,
+.ff-rank-star {
+  background: linear-gradient(135deg, #e0b84e, #a9761e) !important;
+  color: #102016 !important;
+}
+
+.ff-alive-counter-section {
+  background: rgba(30, 76, 48, 0.28) !important;
+  border-color: rgba(214, 180, 78, 0.22) !important;
+}
+
+.ff-alive-icon-box {
+  background: linear-gradient(135deg, rgba(44, 133, 78, 0.5), rgba(16, 62, 39, 0.75)) !important;
+  border-color: #d9aa3a !important;
+  color: #e4bd5c !important;
+}
+
+.ff-alive-pulse-ring { border-color: rgba(112, 187, 119, 0.68) !important; }
+.ff-gauge-val { color: #83c98a !important; }
+.ff-gauge-track { background: rgba(238, 229, 207, 0.16) !important; }
+.ff-gauge-bar {
+  background: linear-gradient(90deg, #b58a2a, #54a86a) !important;
+  box-shadow: 0 0 8px rgba(84, 168, 106, 0.45) !important;
+}
+
+.ff-action-btn,
+.ff-login-btn,
+.ff-settings-input {
+  background: rgba(19, 50, 33, 0.82) !important;
+  border-color: rgba(214, 180, 78, 0.28) !important;
+  color: #eee5cf !important;
+}
+
+.ff-action-btn:hover,
+.ff-login-btn:hover {
+  background: rgba(45, 105, 63, 0.65) !important;
+  border-color: #d9aa3a !important;
+  color: #f1d36e !important;
+}
+
+.ff-settings-dropdown {
+  background: linear-gradient(145deg, rgba(13, 35, 24, 0.98), rgba(7, 22, 15, 0.98)) !important;
+  border: 1px solid rgba(214, 180, 78, 0.36);
+  color: #eee5cf;
+}
+
+.ff-settings-label { color: #d9cba8 !important; }
+.ff-settings-input { color: #f4eddb !important; }
+.ff-settings-save { background: #28784c !important; color: #fff8e8 !important; }
+
+.villon-sidebar-dock {
+  background: rgba(8, 25, 16, 0.92) !important;
+  border-color: rgba(214, 180, 78, 0.42) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.42), 0 0 20px rgba(39, 119, 75, 0.18) !important;
+}
+
+.sidebar-round-btn {
+  background: linear-gradient(145deg, #173c28, #0b2417) !important;
+  border-color: rgba(214, 180, 78, 0.38) !important;
+  color: #e8ddc3 !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28) !important;
+}
+
+.sidebar-round-btn:hover {
+  background: linear-gradient(145deg, #2d8050, #145234) !important;
+  border-color: #e0b84e !important;
+  color: #fff6df !important;
+  box-shadow: 0 0 18px rgba(77, 157, 92, 0.42) !important;
+}
+
+.sidebar-round-btn.active,
+.sidebar-round-btn.active-hud {
+  background: linear-gradient(145deg, #d9aa3a, #a9761e) !important;
+  border-color: #f0d47c !important;
+  color: #102016 !important;
+  box-shadow: 0 0 16px rgba(205, 161, 55, 0.42) !important;
+}
+
+.sidebar-round-btn:disabled,
+.sidebar-round-btn:disabled:hover {
+  background: #17291e !important;
+  border-color: rgba(214, 180, 78, 0.18) !important;
+  color: #89917f !important;
+}
+
+.sidebar-tooltip {
+  background: rgba(8, 25, 16, 0.97) !important;
+  border-color: rgba(214, 180, 78, 0.4) !important;
+  color: #f1ead8 !important;
+}
+
+.sidebar-dot-indicator { border-color: #102016 !important; }
+.admin-badge-btn::after { background: #e0b84e !important; border-color: #102016 !important; }
+
+/* Words of the Day floating learning card */
+.wotd-card {
+  background: linear-gradient(150deg, rgba(15, 40, 27, 0.97), rgba(7, 23, 15, 0.98)) !important;
+  border-color: rgba(214, 180, 78, 0.42) !important;
+  color: #f1ead8 !important;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.42), 0 0 20px rgba(39, 119, 75, 0.18) !important;
+}
+
+.wotd-header { border-color: rgba(214, 180, 78, 0.2) !important; }
+.wotd-card h4,
+.wotd-word-french { color: #f4eddb !important; }
+.wotd-date,
+.wotd-word-english,
+.wotd-example { color: #c9bea4 !important; }
+
+.wotd-icon-badge {
+  background: rgba(214, 180, 78, 0.16) !important;
+  color: #e4bd5c !important;
+}
+
+.wotd-index-badge {
+  background: linear-gradient(135deg, #d9aa3a, #a9761e) !important;
+  color: #102016 !important;
+}
+
+.wotd-word-row {
+  background: rgba(21, 54, 36, 0.72) !important;
+  border-color: rgba(214, 180, 78, 0.18) !important;
+}
+
+.wotd-word-row:hover { border-color: rgba(214, 180, 78, 0.48) !important; }
+
+.wotd-close-btn {
+  background: rgba(21, 54, 36, 0.75) !important;
+  color: #e5dcc5 !important;
+}
+
+.wotd-close-btn:hover {
+  background: rgba(214, 180, 78, 0.2) !important;
+  color: #f1d36e !important;
 }

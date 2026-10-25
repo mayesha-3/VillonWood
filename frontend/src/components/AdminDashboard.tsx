@@ -4,7 +4,7 @@ import {
   Trash2, Check, ArrowLeft, Clock, Lock, Unlock, UserCheck
 } from 'lucide-react';
 import { useAdmin } from '../contexts/AdminContext';
-import type { UserAppRole } from '../contexts/AdminContext';
+import type { UserAppRole, UserCourse } from '../contexts/AdminContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getUserDailyRole, getGMTCountdown } from '../utils/roleRotation';
 import { playSound } from '../utils/soundFX';
@@ -17,11 +17,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMap }) =
   const { 
     usersList, 
     updateUserRole, 
+    updateUserCourse,
     approveUserRole, 
     toggleUserRestriction, 
     deleteUserAccount 
   } = useAdmin();
   const { t } = useLanguage();
+  const isMainAdmin = (email: string) => email.trim().toLowerCase() === 'mayeshaafrooz@gmail.com';
 
   const [activeTab, setActiveTab] = useState<'all' | 'learner' | 'teacher' | 'admin' | 'restricted'>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -206,6 +208,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMap }) =
                 <tr>
                   <th>Citoyen</th>
                   <th>Rôle attribué</th>
+                  <th>Parcours / ville</th>
                   <th>Statut rôle</th>
                   <th>Restrictions</th>
                   <th>Date d'inscription</th>
@@ -215,7 +218,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMap }) =
               <tbody>
                 {filteredUsers.length === 0 ? (
                   <tr>
-                    <td colSpan={6} style={{ textAlign: 'center', padding: '24px', color: '#785b49' }}>
+                    <td colSpan={7} style={{ textAlign: 'center', padding: '24px', color: '#785b49' }}>
                       Aucun citoyen trouvé pour ce filtre.
                     </td>
                   </tr>
@@ -237,10 +240,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMap }) =
                           className="role-select-dropdown"
                           value={u.role}
                           onChange={(e) => handleRoleChange(u.id, e.target.value as UserAppRole)}
+                          disabled={isMainAdmin(u.email)}
+                          aria-label={`Role for ${u.name}`}
                         >
                           <option value="learner">Apprenant (Learner)</option>
                           <option value="teacher">Enseignant (Teacher)</option>
                           <option value="admin">Administrateur (Admin)</option>
+                        </select>
+                      </td>
+
+                      <td>
+                        <select
+                          className="role-select-dropdown"
+                          value={u.course}
+                          onChange={(e) => updateUserCourse(u.id, e.target.value as UserCourse)}
+                          aria-label={`Parcours de ${u.name}`}
+                        >
+                          <option value="village">Village Ancien</option>
+                          <option value="advanced">Cité 2000 (Avancé)</option>
                         </select>
                       </td>
 
@@ -279,6 +296,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMap }) =
                             type="button"
                             className={`action-btn restrict ${u.isRestricted ? 'active' : ''}`}
                             onClick={() => handleToggleRestrict(u.id, u.isRestricted)}
+                            disabled={isMainAdmin(u.email)}
                             title={u.isRestricted ? 'Débloquer l\'utilisateur' : 'Restreindre l\'utilisateur (Avertir & Bannir du chat)'}
                           >
                             {u.isRestricted ? <Unlock size={14} /> : <AlertTriangle size={14} />}
@@ -290,6 +308,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMap }) =
                             type="button"
                             className="action-btn delete"
                             onClick={() => handleDelete(u.id, u.name)}
+                            disabled={isMainAdmin(u.email)}
                             title="Supprimer définitivement le compte"
                           >
                             <Trash2 size={14} />

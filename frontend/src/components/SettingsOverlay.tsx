@@ -3,7 +3,7 @@ import {
   Settings, X, Shield, User, LogOut, Check, Volume2, VolumeX, 
   Sparkles, Clock, Trash2, Flag, Star, AlertTriangle, Send, Award,
   Cake, Flame, Wine, Anchor, Cloud, Utensils, Scissors, Wrench, Globe, 
-  LayoutDashboard, ShieldCheck, GraduationCap, BookOpen, Crown
+  LayoutDashboard, ShieldCheck
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { getSoundEnabled, setSoundEnabled, playSound } from '../utils/soundFX';
@@ -40,7 +40,7 @@ export const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
 }) => {
   const { user, logout } = useAuth();
   const { language, setLanguage, t } = useLanguage();
-  const { currentUserRole, setCurrentUserRole } = useAdmin();
+  const { currentUserRole } = useAdmin();
 
   const [displayName, setDisplayName] = useState(user?.displayName || user?.email?.split('@')[0] || 'Voyageur');
   const [soundEnabled, setSoundState] = useState<boolean>(getSoundEnabled());
@@ -120,7 +120,7 @@ export const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
         </div>
 
         <form onSubmit={handleSave} className="settings-body">
-          {/* Section 0: System Language & App Role */}
+          {/* Section 0: System Language and assigned role */}
           <div className="settings-section">
             <label className="settings-label">
               <Globe size={15} /> {t('languageLabel')}
@@ -143,31 +143,8 @@ export const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
             </div>
 
             <label className="settings-label" style={{ marginTop: '14px' }}>
-              <ShieldCheck size={15} /> {t('appRoleLabel')}
+              <ShieldCheck size={15} /> {t('appRoleLabel')}: {t(currentUserRole === 'learner' ? 'userRoleLearner' : currentUserRole === 'teacher' ? 'userRoleTeacher' : 'userRoleAdmin')}
             </label>
-            <div className="role-selector-pills">
-              <button
-                type="button"
-                className={`role-pill-btn ${currentUserRole === 'learner' ? 'active' : ''}`}
-                onClick={() => { playSound('click'); setCurrentUserRole('learner'); }}
-              >
-                <GraduationCap size={14} /> {t('userRoleLearner')}
-              </button>
-              <button
-                type="button"
-                className={`role-pill-btn ${currentUserRole === 'teacher' ? 'active' : ''}`}
-                onClick={() => { playSound('click'); setCurrentUserRole('teacher'); }}
-              >
-                <BookOpen size={14} /> {t('userRoleTeacher')}
-              </button>
-              <button
-                type="button"
-                className={`role-pill-btn ${currentUserRole === 'admin' ? 'active' : ''}`}
-                onClick={() => { playSound('click'); setCurrentUserRole('admin'); }}
-              >
-                <Crown size={14} /> {t('userRoleAdmin')}
-              </button>
-            </div>
 
             {currentUserRole === 'admin' && onOpenAdminDashboard && (
               <button

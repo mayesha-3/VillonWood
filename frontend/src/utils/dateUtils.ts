@@ -28,7 +28,7 @@ export function getWeekIdUTC(d: Date = new Date()): string {
  * Checks if current day is Monday (day 1) in UTC
  */
 export function isMondayUTC(d: Date = new Date()): boolean {
-  return d.getUTCDay() === 0;
+  return d.getUTCDay() === 1;
 }
 
 /**

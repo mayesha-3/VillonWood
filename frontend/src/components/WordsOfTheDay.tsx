@@ -88,14 +88,14 @@ export const WordsOfTheDay: React.FC<WordsOfTheDayProps> = ({ reopenToken = 0 })
       {/* Header */}
       <div className="flex items-center justify-between pb-2.5 mb-2.5 border-b border-[#a07855]/15 wotd-header">
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-lg bg-[#c46238]/15 text-[#c46238] flex items-center justify-center">
+          <div className="w-6 h-6 rounded-lg bg-[#c46238]/15 text-[#c46238] flex items-center justify-center wotd-icon-badge">
             <BookOpen size={14} />
           </div>
           <div>
             <h4 className="text-xs font-bold text-[#4a3324] leading-tight">
               {t('wordsOfTheDayTitle')}
             </h4>
-            <span className="text-[10px] text-[#785b49] font-medium">
+            <span className="text-[10px] text-[#785b49] font-medium wotd-date">
               {formatDisplayDate(todayUTC, language)}
             </span>
           </div>
@@ -119,7 +119,7 @@ export const WordsOfTheDay: React.FC<WordsOfTheDayProps> = ({ reopenToken = 0 })
             key={idx}
             className="flex items-start gap-2.5 p-2 rounded-xl bg-[#f4eee6]/60 border border-[#a07855]/10 hover:border-[#c46238]/30 transition-colors wotd-word-row"
           >
-            <span className="w-5 h-5 rounded-md bg-[#ede3d5] text-[#c46238] text-[10px] font-extrabold flex items-center justify-center flex-shrink-0 mt-0.5">
+            <span className="w-5 h-5 rounded-md bg-[#ede3d5] text-[#c46238] text-[10px] font-extrabold flex items-center justify-center flex-shrink-0 mt-0.5 wotd-index-badge">
               {idx + 1}
             </span>
 
