@@ -24,6 +24,6 @@ dist-ssr
 *.sw?
 
 # Firebase credentials
-src/firebase.ts
+
 .env
 
