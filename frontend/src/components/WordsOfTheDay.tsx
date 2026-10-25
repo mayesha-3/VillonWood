@@ -12,7 +12,11 @@ export interface WordItem {
   example?: string;
 }
 
-export const WordsOfTheDay: React.FC = () => {
+interface WordsOfTheDayProps {
+  reopenToken?: number;
+}
+
+export const WordsOfTheDay: React.FC<WordsOfTheDayProps> = ({ reopenToken = 0 }) => {
   const { t, language } = useLanguage();
   const todayUTC = getTodayUTC();
   const sessionKey = `villon_wotd_dismissed_${todayUTC}`;
@@ -22,6 +26,13 @@ export const WordsOfTheDay: React.FC = () => {
     return sessionStorage.getItem(sessionKey) === 'true';
   });
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (reopenToken === 0) return;
+    sessionStorage.removeItem(sessionKey);
+    setIsDismissed(false);
+    setLoading(true);
+  }, [reopenToken, sessionKey]);
 
   useEffect(() => {
     if (isDismissed) {
@@ -55,7 +66,7 @@ export const WordsOfTheDay: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, [todayUTC, isDismissed]);
+  }, [todayUTC, isDismissed, reopenToken]);
 
   const handleDismiss = () => {
     playSound('click');
@@ -70,7 +81,7 @@ export const WordsOfTheDay: React.FC = () => {
 
   return (
     <div
-      className="fixed top-5 right-5 z-40 w-72 rounded-2xl bg-[#faf6f0]/95 backdrop-blur-md border border-[#a07855]/25 shadow-xl shadow-[#4a3324]/10 p-4 font-sans text-[#4a3324] animate-fade-in wotd-card"
+      className="fixed bottom-5 left-5 z-40 w-72 rounded-2xl bg-[#faf6f0]/95 backdrop-blur-md border border-[#a07855]/25 shadow-xl shadow-[#4a3324]/10 p-4 font-sans text-[#4a3324] animate-fade-in wotd-card"
       role="region"
       aria-label={t('wordsOfTheDayTitle')}
     >

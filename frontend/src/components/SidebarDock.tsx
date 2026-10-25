@@ -1,5 +1,5 @@
 import React from 'react';
-import { Newspaper, Camera, Music, Settings, Shield, Volume2, LayoutDashboard, BookOpen } from 'lucide-react';
+import { Newspaper, Camera, Music, Settings, Shield, Volume2, LayoutDashboard, BookOpen, GraduationCap } from 'lucide-react';
 import type { ActiveOverlay } from '../types/village';
 import { useAdmin } from '../contexts/AdminContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -10,17 +10,22 @@ interface SidebarDockProps {
   onOpenOverlay: (overlay: ActiveOverlay) => void;
   showHUD: boolean;
   onToggleHUD: () => void;
+  isQuizDay: boolean;
+  onOpenQuiz: () => void;
 }
 
 export const SidebarDock: React.FC<SidebarDockProps> = ({
   activeOverlay,
   onOpenOverlay,
   showHUD,
-  onToggleHUD
+  onToggleHUD,
+  isQuizDay,
+  onOpenQuiz
 }) => {
   const { isPlaying: isPlayingMusic } = useMusic();
   const { currentUserRole } = useAdmin();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const quizScheduleLabel = language === 'fr' ? 'lundi seulement (UTC)' : 'Mondays only (UTC)';
 
   const toggleMusic = () => {
     if (activeOverlay === 'music') {
@@ -76,6 +81,25 @@ export const SidebarDock: React.FC<SidebarDockProps> = ({
         <Settings size={20} />
         <span className="sidebar-tooltip">{t('sidebarSettings')}</span>
       </button>
+
+      {/* Weekly Quiz (learners only; available Mondays) */}
+      {currentUserRole === 'learner' && (
+        <button
+          type="button"
+          className="sidebar-round-btn"
+          onClick={onOpenQuiz}
+          disabled={!isQuizDay}
+          title={`${t('weeklyQuizTitle')}${isQuizDay ? '' : ` — ${quizScheduleLabel}`}`}
+          aria-label={`${t('weeklyQuizTitle')}${isQuizDay ? '' : `, ${quizScheduleLabel}`}`}
+        >
+          <GraduationCap size={20} />
+          <span className="sidebar-tooltip">
+            {isQuizDay
+              ? t('weeklyQuizTitle')
+              : `${t('weeklyQuizTitle')} · ${quizScheduleLabel}`}
+          </span>
+        </button>
+      )}
 
       {/* 5. Teacher Dashboard Button (if teacher or admin) */}
       {(currentUserRole === 'teacher' || currentUserRole === 'admin') && (

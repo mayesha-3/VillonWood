@@ -25,7 +25,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useAdmin } from '../contexts/AdminContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { playSound } from '../utils/soundFX';
-import { getTodayUTC, getWeekIdUTC, isWednesdayUTC, formatDisplayDate } from '../utils/dateUtils';
+import { getTodayUTC, getWeekIdUTC, isMondayUTC, formatDisplayDate } from '../utils/dateUtils';
 
 export interface WordOfTheDayItem {
   french: string;
@@ -53,7 +53,7 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onBackToMap 
 
   const todayUTC = getTodayUTC();
   const currentWeekId = getWeekIdUTC();
-  const isWednesday = isWednesdayUTC();
+  const isMonday = isMondayUTC();
 
   // Toast feedback
   const [toastMsg, setToastMsg] = useState<string | null>(null);
@@ -743,11 +743,11 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onBackToMap 
             </div>
 
             <div className="flex items-center gap-2 teacher-header-right-badges">
-              {isWednesday ? (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#22c55e]/15 text-[#166534] text-xs font-semibold teacher-wednesday-badge active">
+              {isMonday ? (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#22c55e]/15 text-[#166534] text-xs font-semibold teacher-monday-badge active">
                   <Calendar size={13} />
                   <span>
-                    {language === 'fr' ? 'Mercredi — Jour du Quiz' : 'Wednesday — Quiz Day'}
+                    {language === 'fr' ? 'Lundi (UTC) — Jour du Quiz' : 'Monday (UTC) — Quiz Day'}
                   </span>
                 </span>
               ) : (
@@ -788,19 +788,19 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onBackToMap 
             </div>
           </div>
 
-          {!isWednesday && !testModeUnlocked ? (
+          {!isMonday && !testModeUnlocked ? (
             <div className="flex items-start gap-4 p-5 rounded-xl bg-[#f4eee6]/60 border border-[#a07855]/20 teacher-quiz-closed-notice">
               <Calendar size={28} className="text-[#c46238] flex-shrink-0 mt-0.5 teacher-notice-icon" />
               <div className="space-y-2">
                 <h4 className="text-sm font-bold text-[#4a3324]">
                   {language === 'fr'
-                    ? 'Le quiz hebdomadaire est officiellement réservé au mercredi'
-                    : 'The weekly quiz is scheduled for Wednesdays'}
+                    ? 'Le quiz hebdomadaire des apprenants est réservé au lundi (UTC)'
+                    : 'Students can access the weekly quiz on Mondays (UTC)'}
                 </h4>
                 <p className="text-xs text-[#785b49] leading-relaxed">
                   {language === 'fr'
-                    ? 'Chaque mercredi, les apprenants testent leurs connaissances. Vous pouvez préparer et configurer le quiz dès maintenant en activant le mode test.'
-                    : 'Every Wednesday, learners test their skills. You can prepare and build questions right now by activating test mode.'}
+                    ? 'Chaque lundi (UTC), les apprenants testent leurs connaissances. Activez le mode test pour préparer les questions les autres jours.'
+                    : 'Learners take the quiz every Monday (UTC). Enable test mode to prepare questions on other days.'}
                 </p>
                 <button
                   type="button"

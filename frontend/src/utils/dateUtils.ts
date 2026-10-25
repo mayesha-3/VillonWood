@@ -25,10 +25,10 @@ export function getWeekIdUTC(d: Date = new Date()): string {
 }
 
 /**
- * Checks if current day is Wednesday (day 3) in UTC
+ * Checks if current day is Monday (day 1) in UTC
  */
-export function isWednesdayUTC(d: Date = new Date()): boolean {
-  return d.getUTCDay() === 3;
+export function isMondayUTC(d: Date = new Date()): boolean {
+  return d.getUTCDay() === 0;
 }
 
 /**

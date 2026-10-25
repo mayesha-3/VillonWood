@@ -2531,7 +2531,7 @@ body, html {
 .villon-sidebar-dock {
   position: fixed;
   right: 20px;
-  top: 50%;
+  top: 60%;
   transform: translateY(-50%);
   z-index: 150;
   display: flex;
@@ -2568,6 +2568,16 @@ body, html {
   border-color: #d97736;
   color: #d97736;
   box-shadow: 0 8px 20px rgba(217, 119, 54, 0.45);
+}
+
+.sidebar-round-btn:disabled,
+.sidebar-round-btn:disabled:hover {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  border-color: rgba(160, 120, 85, 0.2);
+  color: #785b49;
+  box-shadow: 0 4px 14px rgba(160, 120, 85, 0.08);
 }
 
 .sidebar-round-btn.active,
@@ -3637,6 +3647,33 @@ body, html {
 body:has(.admin-dashboard-page),
 html:has(.admin-dashboard-page) {
   overflow: auto;
+}
+
+/* Teacher Dashboard: allow the document to grow and scroll beyond the viewport. */
+body:has(.teacher-dashboard-page),
+html:has(.teacher-dashboard-page) {
+  height: auto;
+  min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+body:has(.teacher-dashboard-page) #root,
+#root:has(.teacher-dashboard-page) {
+  height: auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: visible;
+}
+
+.teacher-dashboard-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  height: auto;
+}
+
+.teacher-main-container {
+  flex: 1 0 auto;
 }
 
 body:has(.admin-dashboard-page) #root,

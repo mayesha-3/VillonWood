@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
-import { Castle, Users, Radio, Shield, Settings, LogOut, User, Check, X, LogIn } from 'lucide-react';
+import { Castle, Users, Radio, Shield, Settings, LogOut, User, Check, X, LogIn, BookOpen } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface GameHUDTopLeftProps {
   totalVillagers?: number;
   onLogin?: () => void;
+  onShowWordsOfTheDay?: () => void;
 }
 
 export const GameHUDTopLeft: React.FC<GameHUDTopLeftProps> = ({
   totalVillagers = 20,
-  onLogin
+  onLogin,
+  onShowWordsOfTheDay
 }) => {
   const { user, logout } = useAuth();
   const { t } = useLanguage();
@@ -114,6 +116,16 @@ export const GameHUDTopLeft: React.FC<GameHUDTopLeftProps> = ({
         {/* Settings & Logout bar — only when logged in */}
         {user && (
           <div className="ff-actions-bar">
+            <button
+              type="button"
+              className="ff-action-btn"
+              onClick={onShowWordsOfTheDay}
+              title={t('wordsOfTheDayTitle')}
+              aria-label={t('wordsOfTheDayTitle')}
+            >
+              <BookOpen size={13} />
+              <span>{t('wordsOfTheDayTitle')}</span>
+            </button>
             <button className="ff-action-btn" onClick={() => { setShowSettings(!showSettings); setUsernameInput(displayName); }} title={t('hudSettings')}>
               <Settings size={13} />
               <span>{t('hudSettings')}</span>

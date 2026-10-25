@@ -14,7 +14,7 @@ import { doc, getDoc, setDoc, Timestamp } from 'firebase/firestore';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { playSound } from '../utils/soundFX';
-import { getWeekIdUTC } from '../utils/dateUtils';
+import { getWeekIdUTC, isMondayUTC } from '../utils/dateUtils';
 import type { QuizQuestionItem } from './TeacherDashboard';
 
 export interface QuizModalProps {
@@ -43,6 +43,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
   const { user } = useAuth();
   const { t, language } = useLanguage();
   const currentWeekId = getWeekIdUTC();
+  const isQuizDay = isMondayUTC();
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -64,6 +65,15 @@ export const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
     setShowHint(false);
     setCurrentIndex(0);
     setSelectedAnswers({});
+
+    if (!isQuizDay) {
+      setQuizQuestions([]);
+      setUserSubmission(null);
+      setLoading(false);
+      return () => {
+        isMounted = false;
+      };
+    }
 
     async function loadQuizAndSubmission() {
       try {
@@ -116,7 +126,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
     return () => {
       isMounted = false;
     };
-  }, [isOpen, currentWeekId, user]);
+  }, [isOpen, currentWeekId, user, isQuizDay]);
 
   if (!isOpen) return null;
 
@@ -287,7 +297,21 @@ export const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose }) => {
 
         {/* Modal Body */}
         <div className="flex-1 overflow-y-auto p-6 space-y-5 quiz-modal-body">
-          {loading ? (
+          {!isQuizDay ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center space-y-3">
+              <div className="w-14 h-14 rounded-2xl bg-[#ede3d5] text-[#c46238] flex items-center justify-center">
+                <GraduationCap size={28} />
+              </div>
+              <h4 className="text-base font-bold text-[#4a3324]">
+                {language === 'fr' ? 'Le quiz ouvre le lundi (UTC)' : 'Weekly quiz opens on Mondays (UTC)'}
+              </h4>
+              <p className="text-xs text-[#785b49] max-w-sm leading-relaxed">
+                {language === 'fr'
+                  ? 'Revenez lundi pour répondre aux questions de votre enseignant.'
+                  : 'Come back on Monday to answer your teacher’s questions.'}
+              </p>
+            </div>
+          ) : loading ? (
             <div className="flex flex-col items-center justify-center py-16 space-y-3">
               <div className="w-9 h-9 rounded-full border-3 border-[#c46238] border-t-transparent animate-spin" />
               <p className="text-xs text-[#785b49] font-medium">

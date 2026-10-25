@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import GameHUDTopLeft from './components/GameHUDTopLeft';
 import SidebarDock from './components/SidebarDock';
@@ -20,10 +20,11 @@ import { useAdmin } from './contexts/AdminContext';
 import { VILLAGERS_DATA } from './data/villagers';
 import type { VillagerProfession, ActiveOverlay } from './types/village';
 import { Feather, Sparkles } from 'lucide-react';
+import { isMondayUTC } from './utils/dateUtils';
 
 const VillageView: React.FC = () => {
   const { user, loading } = useAuth();
-  const { isCurrentUserRestricted } = useAdmin();
+  const { isCurrentUserRestricted, currentUserRole } = useAdmin();
   const navigate = useNavigate();
 
   const [activeOverlay, setActiveOverlay] = useState<ActiveOverlay>(null);
@@ -31,7 +32,15 @@ const VillageView: React.FC = () => {
   const [isAIOpen, setIsAIOpen] = useState<boolean>(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showHUD, setShowHUD] = useState<boolean>(false);
+  const [wordsReopenToken, setWordsReopenToken] = useState(0);
   const [showQuiz, setShowQuiz] = useState(false);
+  const [isQuizDay, setIsQuizDay] = useState(isMondayUTC);
+
+  useEffect(() => {
+    const refreshQuizDay = () => setIsQuizDay(isMondayUTC());
+    const timer = window.setInterval(refreshQuizDay, 60_000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   const handleSelectLocation = (location: VillagerProfession) => {
     if (!user) {
@@ -74,6 +83,7 @@ const VillageView: React.FC = () => {
         <GameHUDTopLeft 
           totalVillagers={VILLAGERS_DATA.length} 
           onLogin={() => setShowAuthModal(true)} 
+          onShowWordsOfTheDay={() => setWordsReopenToken((token) => token + 1)}
         />
       )}
 
@@ -91,6 +101,14 @@ const VillageView: React.FC = () => {
         onOpenOverlay={handleOpenOverlay}
         showHUD={showHUD}
         onToggleHUD={() => setShowHUD((prev) => !prev)}
+        isQuizDay={isQuizDay}
+        onOpenQuiz={() => {
+          if (!user) {
+            setShowAuthModal(true);
+            return;
+          }
+          setShowQuiz(true);
+        }}
       />
 
       {/* Gated: Villon Media */}
@@ -166,12 +184,12 @@ const VillageView: React.FC = () => {
       )}
 
       {/* Words of the Day floating card (students see this on the map) */}
-      {user && <WordsOfTheDay />}
+      {user && <WordsOfTheDay reopenToken={wordsReopenToken} />}
 
       {/* Weekly Quiz Modal */}
-      {user && (
+      {user && currentUserRole === 'learner' && (
         <QuizModal
-          isOpen={showQuiz}
+          isOpen={showQuiz && isQuizDay}
           onClose={() => setShowQuiz(false)}
         />
       )}
