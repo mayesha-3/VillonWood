@@ -4,6 +4,7 @@ export interface ChatMessage {
   avatar: string;
   time: string;
   text: string;
+  englishTranslation?: string;
   role?: string;
   isUser?: boolean;
 }

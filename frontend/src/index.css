@@ -1236,6 +1236,22 @@ body, html {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
 }
 
+.floating-bubble-translation {
+  display: block;
+  margin-top: 7px;
+  padding-top: 7px;
+  border-top: 1px solid rgba(107, 114, 128, 0.2);
+  color: #6b7280;
+  font-size: 12px;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.companion-typing {
+  color: #6b7280;
+  font-style: italic;
+}
+
 .is-user .floating-bubble-text {
   background: linear-gradient(135deg, #d97736, #c45218);
   color: #ffffff;

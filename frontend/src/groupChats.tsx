@@ -1,20 +1,61 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import type { VillagerProfession, ChatMessage } from './types/village';
 import { X, Send, Anchor, MapPin, Lock } from 'lucide-react';
 import { playSound } from './utils/soundFX';
 import { useAdmin } from './contexts/AdminContext';
 import { useLanguage } from './contexts/LanguageContext';
+import { useAuth } from './contexts/AuthContext';
+import { askGroupChatCompanion, getGroupChatCompanion } from './utils/groupChatCompanions';
 
 interface GroupChatProps {
   location: VillagerProfession | null;
   onClose: () => void;
 }
 
+function createInitialMessages(location: VillagerProfession | null): ChatMessage[] {
+  if (!location) return [];
+
+  const companion = getGroupChatCompanion(location);
+  if (!companion) return [...location.sampleMessages];
+
+  return [
+    ...location.sampleMessages,
+    {
+      id: `companion-welcome-${location.id}`,
+      sender: companion.name,
+      avatar: companion.avatar,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      text: companion.welcome.fr,
+      englishTranslation: companion.welcome.en,
+      role: 'Ami du groupe'
+    }
+  ];
+}
+
 export const GroupChat: React.FC<GroupChatProps> = ({ location, onClose }) => {
   const { isCurrentUserRestricted } = useAdmin();
+  const { user } = useAuth();
   const { t } = useLanguage();
-  const [messages, setMessages] = useState<ChatMessage[]>(location ? location.sampleMessages : []);
+  const companion = location ? getGroupChatCompanion(location) : null;
+  const [messages, setMessages] = useState<ChatMessage[]>(() => createInitialMessages(location));
   const [inputText, setInputText] = useState<string>('');
+  const [isCompanionTyping, setIsCompanionTyping] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const requestIdRef = useRef(0);
+
+  useEffect(() => {
+    requestIdRef.current += 1;
+    setMessages(createInitialMessages(location));
+    setInputText('');
+    setIsCompanionTyping(false);
+    return () => {
+      requestIdRef.current += 1;
+    };
+  }, [location?.id]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isCompanionTyping]);
 
   useEffect(() => {
     if (location) {
@@ -30,15 +71,17 @@ export const GroupChat: React.FC<GroupChatProps> = ({ location, onClose }) => {
 
   if (!location) return null;
 
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputText.trim() || isCurrentUserRestricted) return;
+    if (!location || !inputText.trim() || isCurrentUserRestricted || isCompanionTyping) return;
 
     playSound('message');
 
+    const senderName = user?.displayName || user?.email?.split('@')[0] || 'Vous';
+
     const newMsg: ChatMessage = {
       id: `user-msg-${Date.now()}`,
-      sender: 'Vous (voyageur)',
+      sender: senderName,
       avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=YouTraveler',
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       text: inputText.trim(),
@@ -47,6 +90,45 @@ export const GroupChat: React.FC<GroupChatProps> = ({ location, onClose }) => {
 
     setMessages((prev) => [...prev, newMsg]);
     setInputText('');
+
+    if (companion) {
+      const requestId = ++requestIdRef.current;
+      const conversation = [...messages, newMsg];
+      setIsCompanionTyping(true);
+      try {
+        const reply = await askGroupChatCompanion(location, companion, conversation, senderName);
+        if (requestIdRef.current !== requestId) return;
+
+        const companionMessage: ChatMessage = {
+          id: `companion-${Date.now()}`,
+          sender: companion.name,
+          avatar: companion.avatar,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          text: reply.fr,
+          englishTranslation: reply.en,
+          role: t('groupChatFriend')
+        };
+
+        setMessages((prev) => [...prev, companionMessage]);
+        playSound('message');
+      } catch (error) {
+        console.error('Group chat companion request failed:', error);
+        if (requestIdRef.current === requestId) {
+          setMessages((prev) => [...prev, {
+            id: `companion-error-${Date.now()}`,
+            sender: companion.name,
+            avatar: companion.avatar,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            text: 'Oh, la connexion fait des siennes ! Tu peux répéter ?',
+            englishTranslation: 'Oh, the connection is acting up! Could you say that again?',
+            role: t('groupChatFriend')
+          }]);
+        }
+      } finally {
+        if (requestIdRef.current === requestId) setIsCompanionTyping(false);
+      }
+      return;
+    }
 
     setTimeout(() => {
       let replyText: string;
@@ -132,13 +214,31 @@ export const GroupChat: React.FC<GroupChatProps> = ({ location, onClose }) => {
                   {msg.role && <span className="floating-role">{msg.role}</span>}
                   <span className="floating-time">{msg.time}</span>
                 </div>
-                <div className="floating-bubble-text">{msg.text}</div>
+                <div className="floating-bubble-text">
+                  <span>{msg.text}</span>
+                  {msg.englishTranslation && (
+                    <span className="floating-bubble-translation">{msg.englishTranslation}</span>
+                  )}
+                </div>
               </div>
               {msg.isUser && (
                 <img src={msg.avatar} alt="Vous" className="floating-avatar" />
               )}
             </div>
           ))}
+          {isCompanionTyping && companion && (
+            <div className="floating-bubble-row is-villager" aria-live="polite">
+              <img src={companion.avatar} alt={companion.name} className="floating-avatar" />
+              <div className="floating-bubble-content">
+                <div className="floating-bubble-meta">
+                  <span className="floating-sender">{companion.name}</span>
+                  <span className="floating-role">{t('groupChatFriend')}</span>
+                </div>
+                <div className="floating-bubble-text companion-typing">{t('groupChatTyping')}</div>
+              </div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
         </div>
 
         {/* Floating Messenger Input Bar */}
@@ -146,12 +246,12 @@ export const GroupChat: React.FC<GroupChatProps> = ({ location, onClose }) => {
           <input
             type="text"
             className="floating-chat-input"
-            placeholder={isCurrentUserRestricted ? t('chatRestricted') : `${t('chatPlaceholder')} ${location.name}...`}
+            placeholder={isCurrentUserRestricted ? t('chatRestricted') : isCompanionTyping ? t('groupChatTyping') : `${t('chatPlaceholder')} ${location.name}...`}
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            disabled={isCurrentUserRestricted}
+            disabled={isCurrentUserRestricted || isCompanionTyping}
           />
-          <button type="submit" className="floating-send-btn" disabled={!inputText.trim() || isCurrentUserRestricted}>
+          <button type="submit" className="floating-send-btn" disabled={!inputText.trim() || isCurrentUserRestricted || isCompanionTyping}>
             {isCurrentUserRestricted ? <Lock size={16} /> : <Send size={16} />}
             <span>{isCurrentUserRestricted ? t('chatRestrictedBtn') : t('chatSend')}</span>
           </button>

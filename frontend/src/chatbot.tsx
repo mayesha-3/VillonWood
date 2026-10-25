@@ -21,62 +21,24 @@ interface Message {
   time: string;
 }
 
-const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
-
-const SYSTEM_PROMPT = `You are Villon AI — an expert French language tutor and bilingual village guide in the medieval village of VillonWood. You help learners understand French through immersive, context-rich explanations.
-
-When the user asks about a French word, phrase, or topic:
-1. Provide a relevant French sentence naturally related to the topic.
-2. Show the full translation using "=>" (e.g., "La boulangerie est au coin de la rue. => The bakery is at the corner of the street.")
-3. Break down key words/phrases with aligned translations, each on its own line (e.g., "la boulangerie => the bakery")
-
-When the user writes in French, help them understand what they said and gently correct any mistakes.
-When the user greets you, respond warmly in French with a translation.
-
-Keep responses concise (under 150 words). Stay in character as a friendly village tutor. Do not use markdown formatting — just plain text with "=>" for translations.`;
-
-async function queryGroq(conversationHistory: Message[]): Promise<string> {
-  if (!GROQ_API_KEY || GROQ_API_KEY === 'your_groq_api_key_here') {
-    return 'Villon AI is not configured yet. Please add your free Groq API key to the .env file (VITE_GROQ_API_KEY). Get one at console.groq.com';
-  }
-
-  const apiMessages = [
-    { role: 'system' as const, content: SYSTEM_PROMPT },
-    ...conversationHistory.slice(-10).map(m => ({
-      role: (m.sender === 'user' ? 'user' : 'assistant') as 'user' | 'assistant',
-      content: m.text
-    }))
-  ];
-
+async function translate(text: string): Promise<string> {
   try {
-    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    const res = await fetch('/api/translate', {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${GROQ_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "qwen/qwen3.8-27b",
-        messages: apiMessages,
-        max_tokens: 500,
-        temperature: 0.7,
-      }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text }),
     });
 
     if (!res.ok) {
-      const errData = await res.json().catch(() => ({}));
-      console.error('Groq API error:', res.status, errData);
-      if (res.status === 429) {
-        return 'The AI is a bit busy right now — too many requests. Please wait a moment and try again.';
-      }
-      return 'Something went wrong connecting to the AI. Please try again in a moment.';
+      const data = await res.json().catch(() => ({}));
+      return data.error || 'Could not translate that text. Please try again.';
     }
 
     const data = await res.json();
-    return data.choices?.[0]?.message?.content || 'I could not generate a response. Please try again.';
+    return typeof data.translation === 'string' ? data.translation : 'Could not translate that text. Please try again.';
   } catch (err) {
-    console.error('Groq fetch error:', err);
-    return 'Could not reach the AI service. Please check your internet connection and try again.';
+    console.error('Translator request failed:', err);
+    return 'Could not reach the translation service. Make sure the app server is running.';
   }
 }
 
@@ -88,13 +50,13 @@ export const Chatbot: React.FC<ChatbotProps> = ({
     {
       id: 'ai-welcome',
       sender: 'ai',
-      text: 'Salutations ! I am Villon AI — your bilingual village guide & translator. Ask me anything in English or French!',
+      text: 'Bonjour ! Send me any English or French text, and I will translate it into the other language.',
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     },
     {
       id: 'ai-tip',
       sender: 'ai',
-      text: 'Try asking: "Where is the bakery?" or "Comment dit-on bread en français?"',
+      text: 'English → French • Français → anglais',
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   ]);
@@ -123,13 +85,11 @@ export const Chatbot: React.FC<ChatbotProps> = ({
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
-    const updatedMessages = [...messages, userMsg];
-    setMessages(updatedMessages);
+    setMessages((prev) => [...prev, userMsg]);
     if (!textOverride) setInputText('');
     setIsTyping(true);
 
-    // Call Groq AI
-    const reply = await queryGroq(updatedMessages);
+    const reply = await translate(userMsg.text);
 
     const aiMsg: Message = {
       id: `ai-${Date.now()}`,
@@ -158,7 +118,7 @@ export const Chatbot: React.FC<ChatbotProps> = ({
             <h3 className="vai-title">Villon AI</h3>
             <p className="vai-subtitle">
               <Globe size={10} />
-              <span>English ↔ Français • En ligne</span>
+              <span>Translation only • English ↔ Français</span>
             </p>
           </div>
         </div>
@@ -201,10 +161,8 @@ export const Chatbot: React.FC<ChatbotProps> = ({
       {/* QUICK PROMPTS */}
       <div className="vai-quick-prompts">
         {[
-          { label: 'Where is the bakery?', text: 'Where is the bakery?' },
-          { label: 'Translate: wine', text: 'Translate the word "wine" to French and explain it' },
-          { label: 'Bonjour !', text: 'Bonjour !' },
-          { label: 'Village life', text: 'Tell me about daily life in a French village' },
+          { label: 'English → French', text: 'Good morning, how are you today?' },
+          { label: 'Français → anglais', text: 'Bonjour, comment allez-vous aujourd’hui ?' },
         ].map((p, i) => (
           <button key={i} type="button" className="vai-prompt-chip" onClick={() => handleSend(p.text)}>
             <span>{p.label}</span>

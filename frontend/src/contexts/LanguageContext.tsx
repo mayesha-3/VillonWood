@@ -113,6 +113,8 @@ export const translations: Translations = {
   chatRestricted: { fr: 'Accès au chat restreint par l\'administrateur...', en: 'Chat restricted by administrator...' },
   chatRestrictedBtn: { fr: 'Restreint', en: 'Restricted' },
   chatClose: { fr: 'Fermer la discussion', en: 'Close chat' },
+  groupChatFriend: { fr: 'Ami du groupe', en: 'Group friend' },
+  groupChatTyping: { fr: 'écrit…', en: 'is typing…' },
 
   // HUD
   hudLogin: { fr: 'Se connecter', en: 'Log In' },
